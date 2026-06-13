@@ -11,7 +11,7 @@ class CCRetrievalAgent:
         "lonelyplanet.com", "cntraveller.com", "theguardian.com/travel",
     ]
 
-    def __init__(self, db_path: str = ".lancedb_cc"):
+    def __init__(self, db_path: str = None):
         self.vector_store = VectorStore(db_path=db_path)
 
     def retrieve(self, brief: ResearchBrief, sources: List[Dict]) -> List[Dict[str, Any]]:
