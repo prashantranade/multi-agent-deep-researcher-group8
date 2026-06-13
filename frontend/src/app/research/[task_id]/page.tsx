@@ -104,8 +104,7 @@ export default function LiveTracker() {
   const savedHistory = typeof window !== 'undefined' ? JSON.parse(localStorage.getItem('research_history') || '[]') : [];
   const runInfo = savedHistory.find((item: any) => item.id === task_id);
   const persona = runInfo?.persona || 'product_manager';
-  // @ts-ignore
-  const pipelineNodes = PERSONA_PIPELINES[persona] || PERSONA_PIPELINES.product_manager;
+  const pipelineNodes = PERSONA_PIPELINES[persona as keyof typeof PERSONA_PIPELINES] || PERSONA_PIPELINES.product_manager;
 
   // Estimate active node based on status & log size
   const getActiveNode = () => {
@@ -176,7 +175,7 @@ export default function LiveTracker() {
         <div className="glass-panel rounded-3xl p-6">
           <span className="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-6">Workflow Graph Pipeline</span>
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 md:gap-2">
-            {pipelineNodes.map((node, index) => {
+            {pipelineNodes.map((node: string, index: number) => {
               const isActive = activeNode === node;
               const isPast = statusData.status === 'complete' || 
                 (pipelineNodes.indexOf(activeNode) > index);
@@ -217,7 +216,7 @@ export default function LiveTracker() {
             <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Live Agent Exec Logs</span>
           </div>
           <div className="p-6 bg-slate-955 font-mono text-xs text-purple-400 space-y-3 h-[250px] overflow-y-auto">
-            {statusData.notes && statusData.notes.map((note, i) => (
+            {statusData.notes && statusData.notes.map((note: string, i: number) => (
               <div key={i} className="leading-relaxed flex gap-2">
                 <span className="text-slate-700 select-none">[{new Date().toLocaleTimeString()}]</span>
                 <span className="text-purple-300">{note}</span>
