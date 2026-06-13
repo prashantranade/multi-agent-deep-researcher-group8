@@ -81,9 +81,11 @@ def test_pm_retrieval_clears_table_before_add(tmp_path):
 
 def test_pm_retrieval_query_string(tmp_path):
     with patch("crews.product_manager.retrieval_agent.scrape_selected_sources") as mock_scrape, \
-         patch("crews.product_manager.retrieval_agent.VectorStore") as mock_vs:
+         patch("crews.product_manager.retrieval_agent.VectorStore") as mock_vs, \
+         patch("crews.product_manager.retrieval_agent.TavilyClient") as mock_tavily:
         mock_scrape.return_value = []
         mock_vs.return_value.search.return_value = []
+        mock_tavily.return_value.search.return_value = {"results": []}
         agent = PMRetrievalAgent(db_path=str(tmp_path))
         brief = ResearchBrief(
             topic="edtech India", persona="product_manager", audience="founders",

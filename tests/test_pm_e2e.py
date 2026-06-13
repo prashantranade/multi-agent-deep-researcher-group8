@@ -61,11 +61,13 @@ def test_pm_crew_single_artifact(tmp_path):
     )
     with patch("crews.product_manager.retrieval_agent.scrape_selected_sources") as mock_scrape, \
          patch("crews.product_manager.retrieval_agent.VectorStore") as mock_vs, \
+         patch("crews.product_manager.retrieval_agent.TavilyClient") as mock_tavily, \
          patch("crews.product_manager.analysis_agent.chat_with_fallback") as mock_analysis_llm, \
          patch("crews.product_manager.output_agent.chat_with_fallback") as mock_output_llm:
 
         mock_scrape.return_value = []
         mock_vs.return_value.search.return_value = []
+        mock_tavily.return_value.search.return_value = {"results": []}
         mock_analysis_llm.return_value = '{"market_size": "medium", "competitors": [], "user_pain_points": ["affordability"], "opportunity": "underserved rural segment", "contradictions": [], "key_data_points": []}'
         mock_output_llm.return_value = "## User Problems\n- Problem: affordability"
 
