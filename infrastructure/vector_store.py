@@ -38,7 +38,7 @@ class VectorStore:
         k: int = 5,
         filter_source: Optional[str] = None,
     ) -> List[Dict[str, Any]]:
-        if table_name not in self.db.list_tables().tables:
+        if table_name not in _table_names(self.db):
             return []
         query_vector = self.embeddings.embed_query(query)
         tbl = self.db.open_table(table_name)
