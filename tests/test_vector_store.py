@@ -5,7 +5,7 @@ from infrastructure.vector_store import VectorStore, _table_names
 
 @pytest.fixture
 def mock_store(tmp_path):
-    with patch("infrastructure.vector_store.OpenAIEmbeddings") as mock_emb:
+    with patch("infrastructure.vector_store.HuggingFaceEmbeddings") as mock_emb:
         mock_emb.return_value.embed_documents.return_value = [[0.1, 0.2, 0.3], [0.4, 0.5, 0.6]]
         mock_emb.return_value.embed_query.return_value = [0.1, 0.2, 0.3]
         store = VectorStore(db_path=str(tmp_path / "test_db"))

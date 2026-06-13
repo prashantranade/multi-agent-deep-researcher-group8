@@ -1,7 +1,7 @@
 # infrastructure/vector_store.py
 import lancedb
 from typing import List, Dict, Optional, Any
-from langchain_openai import OpenAIEmbeddings
+from langchain_huggingface import HuggingFaceEmbeddings
 import config
 
 
@@ -17,7 +17,7 @@ def _table_names(db) -> list:
 class VectorStore:
     def __init__(self, db_path: str = None):
         self.db = lancedb.connect(db_path or config.LANCEDB_PATH)
-        self.embeddings = OpenAIEmbeddings(api_key=config.OPENAI_API_KEY)
+        self.embeddings = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
 
     def add_texts(self, texts: List[str], metadatas: List[Dict], table_name: str) -> None:
         vectors = self.embeddings.embed_documents(texts)

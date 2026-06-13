@@ -8,12 +8,15 @@ def _encode_image(image_path: str) -> str:
         return base64.b64encode(f.read()).decode("utf-8")
 
 def analyse_image(image_path: str) -> str:
-    client = OpenAI(api_key=config.OPENAI_API_KEY)
+    client = OpenAI(
+        api_key=config.OPENROUTER_API_KEY,
+        base_url="https://openrouter.ai/api/v1",
+    )
     b64 = _encode_image(image_path)
     ext = image_path.rsplit(".", 1)[-1].lower()
     mime = f"image/{ext}" if ext in ("png", "jpg", "jpeg", "gif", "webp") else "image/png"
     response = client.chat.completions.create(
-        model="gpt-4o",
+        model="openai/gpt-4o",
         messages=[{
             "role": "user",
             "content": [
