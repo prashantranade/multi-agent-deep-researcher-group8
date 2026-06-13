@@ -187,3 +187,38 @@ def test_content_agent_generates_itinerary():
 
     assert result["type"] == "itinerary"
     assert "content" in result
+
+
+def test_social_agent_generates_instagram():
+    from crews.bharat_desha.social_agent import run_social_agent
+
+    primary_artifact = {
+        "type": "blog_post",
+        "content": "# Varanasi Spiritual Tour\n\nVaranasi spiritual tour begins at dawn...",
+        "citations": []
+    }
+    key_points = ["Visit Kashi Vishwanath at dawn", "Sunrise boat ride on the Ganga"]
+    seo_context = {"primary_keyword": "Varanasi spiritual tour", "keywords": []}
+
+    mock_response = "Step into the sacred energy of Varanasi The ghats come alive at dawn...\n\n#VaranasiTravel #SpiritualIndia #BharatDesha"
+
+    with patch("crews.bharat_desha.social_agent.chat_with_fallback", return_value=mock_response):
+        results = run_social_agent(primary_artifact, key_points, seo_context, platforms=["instagram"])
+
+    assert len(results) == 1
+    assert results[0]["type"] == "instagram"
+    assert len(results[0]["content"]) > 50
+
+def test_social_agent_generates_multiple_platforms():
+    from crews.bharat_desha.social_agent import run_social_agent
+
+    primary_artifact = {"type": "blog_post", "content": "Varanasi guide...", "citations": []}
+    key_points = ["Key point 1"]
+    seo_context = {"primary_keyword": "Varanasi guide", "keywords": []}
+
+    with patch("crews.bharat_desha.social_agent.chat_with_fallback", return_value="mock social content"):
+        results = run_social_agent(primary_artifact, key_points, seo_context, platforms=["instagram", "facebook", "x_post", "youtube"])
+
+    assert len(results) == 4
+    types = [r["type"] for r in results]
+    assert set(types) == {"instagram", "facebook", "x_post", "youtube"}
