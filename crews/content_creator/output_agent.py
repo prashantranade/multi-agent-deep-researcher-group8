@@ -21,6 +21,17 @@ class CCOutputAgent:
         hook = analysis.get("hooks", [""])[0] if analysis.get("hooks") else ""
         tone = analysis.get("tone_notes", "informative")
         artifacts = []
+        # generators = {
+        #     "content_brief": lambda: self._generate(CONTENT_BRIEF_PROMPT.format(analysis=analysis)),
+        #     "social_draft": lambda: self._generate(
+        #         SOCIAL_DRAFT_PROMPT.format(analysis=analysis, hook=hook, tone=tone)
+        #     ),
+        #     "captions": lambda: self._generate(CAPTIONS_PROMPT.format(analysis=analysis)),
+        #     "hashtags": lambda: self._generate(
+        #         HASHTAGS_PROMPT.format(topic=analysis.get("trends", [""])[0], analysis=analysis)
+        #     ),
+        #     "calendar_entry": lambda: self._generate(CALENDAR_ENTRY_PROMPT.format(analysis=analysis)),
+        # }
         generators = {
             "content_brief": lambda: self._generate(CONTENT_BRIEF_PROMPT.format(analysis=analysis)),
             "social_draft": lambda: self._generate(
@@ -28,7 +39,7 @@ class CCOutputAgent:
             ),
             "captions": lambda: self._generate(CAPTIONS_PROMPT.format(analysis=analysis)),
             "hashtags": lambda: self._generate(
-                HASHTAGS_PROMPT.format(topic=analysis.get("trends", [""])[0], analysis=analysis)
+                HASHTAGS_PROMPT.format(topic=(analysis.get("trends") or [""])[0] if analysis.get("trends") else "general topic", analysis=analysis)
             ),
             "calendar_entry": lambda: self._generate(CALENDAR_ENTRY_PROMPT.format(analysis=analysis)),
         }
