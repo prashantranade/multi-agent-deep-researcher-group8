@@ -22,3 +22,15 @@ class ProductManagerCrew(BaseCrew):
         self, analysis: Dict[str, Any], selected_artifacts: List[str]
     ) -> List[Dict[str, Any]]:
         return self._output.generate_artifacts(analysis, selected_artifacts)
+
+    def run(self, brief: ResearchBrief) -> CrewOutput:
+        retrieved = self.retrieve(brief, brief.selected_sources)
+        notes = []
+        if self._retrieval.fallback_used:
+            notes.append(
+                "Selected sources couldn't be scraped (likely paywalled or JS-rendered). "
+                "Fell back to a Tavily web search to find relevant content — results are based on publicly available articles."
+            )
+        analysis = self.analyse(retrieved)
+        artifacts = self.generate_artifacts(analysis, brief.selected_artifacts)
+        return CrewOutput(artifacts=artifacts, notes=notes)

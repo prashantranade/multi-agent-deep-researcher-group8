@@ -18,6 +18,7 @@ class ResearchBrief:
 class CrewOutput:
     artifacts: List[Dict[str, Any]]     # [{"type": str, "content": str, "citations": List}]
     trace_id: Optional[str] = None
+    notes: List[str] = field(default_factory=list)
 
 class BaseCrew(ABC):
     """

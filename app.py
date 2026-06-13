@@ -165,9 +165,12 @@ if st.session_state.step >= 7:
                     crew = get_crew(st.session_state.persona)
                     output = crew.run(st.session_state.brief)
                     st.session_state.artifacts = output.artifacts
+                    st.session_state.crew_notes = output.notes
                 except Exception as e:
                     st.error(f"Agent error: {e}")
                     st.stop()
+        for note in st.session_state.get("crew_notes", []):
+            st.info(f"ℹ️ {note}")
         for artifact in st.session_state.get("artifacts", []):
             render_artifact(artifact)
             exported = export_artifact(artifact)
