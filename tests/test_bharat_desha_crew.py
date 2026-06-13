@@ -141,3 +141,49 @@ def test_analysis_agent_returns_bharat_desha_lens():
     for key in ["spiritual", "practical", "cultural", "wellness", "seasonal", "key_points", "citations"]:
         assert key in result
     assert isinstance(result["key_points"], list)
+
+
+def test_content_agent_generates_blog_post():
+    from crews.bharat_desha.content_agent import run_content_agent
+
+    analysis = {
+        "spiritual": "Varanasi is the abode of Lord Shiva...",
+        "practical": "Fly into VNS airport...",
+        "cultural": "Ganga aarti at Dashashwamedh Ghat...",
+        "wellness": "Several ashrams near Assi Ghat...",
+        "seasonal": "October to March is ideal...",
+        "key_points": ["Visit at dawn", "Sunrise boat ride"],
+        "citations": ["https://example.com"]
+    }
+    seo_context = {
+        "keywords": [{"keyword": "Varanasi spiritual tour", "intent": "informational"}],
+        "primary_keyword": "Varanasi spiritual tour"
+    }
+
+    mock_response = "# Varanasi Spiritual Tour: Your Complete Guide\n\nVaranasi spiritual tour begins at dawn on the banks of the sacred Ganga river, one of the holiest journeys in Sanatan Dharma."
+
+    with patch("crews.bharat_desha.content_agent.chat_with_fallback", return_value=mock_response):
+        result = run_content_agent(analysis, seo_context, artifact_type="blog_post", tone="warm", depth="standard")
+
+    assert result["type"] == "blog_post"
+    assert len(result["content"]) > 100
+    assert "citations" in result
+
+def test_content_agent_generates_itinerary():
+    from crews.bharat_desha.content_agent import run_content_agent
+
+    analysis = {
+        "spiritual": "...", "practical": "...", "cultural": "...",
+        "wellness": "...", "seasonal": "...",
+        "key_points": ["Day 1: Arrive", "Day 2: Ghats"],
+        "citations": ["https://example.com"]
+    }
+    seo_context = {"keywords": [], "primary_keyword": "Varanasi itinerary"}
+
+    mock_response = "## Day 1: Arrival in Varanasi\n\nCheck into your hotel near Assi Ghat..."
+
+    with patch("crews.bharat_desha.content_agent.chat_with_fallback", return_value=mock_response):
+        result = run_content_agent(analysis, seo_context, artifact_type="itinerary", tone="practical", depth="deep")
+
+    assert result["type"] == "itinerary"
+    assert "content" in result
