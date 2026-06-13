@@ -17,11 +17,19 @@ _RENDER_CONFIGS = {
     "content_brief":        {"label": "Content Brief",         "display": "markdown"},
     "social_post":          {"label": "Social Post",           "display": "text_box"},
     "newsletter":           {"label": "Newsletter",            "display": "markdown"},
+    "social_draft":         {"label": "Social Draft",          "display": "text_box"},
+    "captions":             {"label": "Captions",              "display": "text_box"},
+    "hashtags":             {"label": "Hashtags",              "display": "text_box"},
+    "calendar_entry":       {"label": "Calendar Entry",        "display": "markdown"},
     # Product Manager artifacts
     "competitive_analysis": {"label": "Competitive Analysis",  "display": "markdown"},
     "product_roadmap":      {"label": "Product Roadmap",       "display": "markdown"},
     "user_research":        {"label": "User Research",         "display": "markdown"},
     "executive_summary":    {"label": "Executive Summary",     "display": "markdown"},
+    "research_brief":       {"label": "Research Brief",        "display": "markdown"},
+    "competitive_summary":  {"label": "Competitive Summary",   "display": "markdown"},
+    "opportunity_sizing":   {"label": "Opportunity Sizing",    "display": "markdown"},
+    "prd_insights":         {"label": "PRD Insights",          "display": "markdown"},
 }
 
 _DEFAULT_CONFIG = {"label": "Output", "display": "markdown"}
