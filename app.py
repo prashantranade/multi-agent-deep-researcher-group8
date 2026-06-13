@@ -42,6 +42,9 @@ def _load_crew(persona: str):
                 analysis = self.analysis.analyse(retrieved)
                 return self.output.generate_artifacts(analysis, brief.selected_artifacts)
         return PMCrew()
+    elif persona == "bharat_desha":
+        from crews.bharat_desha.crew import BharatDeshaCrew
+        return BharatDeshaCrew()
 
 st.set_page_config(page_title="Deep Researcher", layout="wide")
 st.title("Multi-Agent Deep Researcher")
@@ -62,9 +65,23 @@ if "sources" not in st.session_state:
 
 # ── STEP 1: Persona ──────────────────────────────────────────────────────────
 with st.expander("Step 1 — Select your persona", expanded=st.session_state.step == 1):
-    persona = st.radio("I am a...", ["Content Creator", "Product Manager"], horizontal=True)
+    persona = st.radio(
+        "I am a...",
+        ["Content Creator", "Product Manager", "Bharat Desha"],
+        captions=[
+            "",
+            "",
+            "Spiritual India travel content — itineraries, destination guides, Sanatan Dharma, wellness, and social media repurposing.",
+        ],
+        horizontal=True,
+    )
     if st.button("Continue →", key="step1"):
-        st.session_state.persona = "content_creator" if "Creator" in persona else "product_manager"
+        persona_map = {
+            "Content Creator": "content_creator",
+            "Product Manager": "product_manager",
+            "Bharat Desha": "bharat_desha",
+        }
+        st.session_state.persona = persona_map[persona]
         st.session_state.step = 2
         st.rerun()
 
@@ -151,11 +168,16 @@ if st.session_state.step >= 5:
 if st.session_state.step >= 6:
     with st.expander("Step 6 — What do you want out?", expanded=st.session_state.step == 6):
         persona = st.session_state.persona
+        always_included = []
         if persona == "content_creator":
             options = ["content_brief", "social_draft", "captions", "hashtags", "calendar_entry"]
+        elif persona == "bharat_desha":
+            always_included = ["seo_keywords"]
+            options = ["blog_post", "itinerary", "destination_guide", "wellness_guide", "instagram", "facebook", "x_post", "youtube"] + always_included
         else:
             options = ["research_brief", "competitive_summary", "opportunity_sizing", "prd_insights"]
-        selected_artifacts = st.multiselect("Select artifacts to generate", options, default=[options[0]])
+        default_artifacts = always_included if always_included else [options[0]]
+        selected_artifacts = st.multiselect("Select artifacts to generate", options, default=default_artifacts)
         if st.button("Run research agents →", key="step6") and selected_artifacts:
             st.session_state.brief.selected_artifacts = selected_artifacts
             st.session_state.step = 7
