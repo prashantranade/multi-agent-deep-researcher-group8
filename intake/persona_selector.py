@@ -3,13 +3,13 @@ PERSONAS = {
     "content_creator": {
         "label": "Content Creator",
         "description": "Research and create engaging content for blogs, social media, and newsletters.",
-        "artifacts": ["blog_post", "social_post", "newsletter", "content_brief"],
+        "artifacts": ["content_brief", "social_draft", "captions", "hashtags", "calendar_entry"],
         "always_included": [],
     },
     "product_manager": {
         "label": "Product Manager",
         "description": "Competitive research, market analysis, and product strategy documents.",
-        "artifacts": ["competitive_analysis", "product_roadmap", "user_research", "executive_summary"],
+        "artifacts": ["research_brief", "competitive_summary", "opportunity_sizing", "prd_insights"],
         "always_included": [],
     },
     "bharat_desha": {
