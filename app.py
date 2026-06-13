@@ -66,7 +66,7 @@ if st.session_state.step >= 2:
 if st.session_state.step >= 3:
     with st.expander("Step 3 — Add context (optional)", expanded=st.session_state.step == 3):
         url_input = st.text_input("Your website or relevant URL", placeholder="https://bharatdesha.com")
-        handle_input = st.text_input("Social media handle", placeholder="@bharatdesha")
+        handle_input = st.text_input("Social media handle", placeholder="@thebharatdesha")
         uploaded_files = st.file_uploader("Upload documents or images", accept_multiple_files=True,
                                           type=["pdf", "docx", "txt", "png", "jpg", "jpeg"])
         if st.button("Continue →", key="step3"):
@@ -81,25 +81,28 @@ if st.session_state.step >= 3:
             st.rerun()
 
 # ── STEP 4: Clarification ─────────────────────────────────────────────────────
+_CLARIFICATION_QUESTIONS = {
+    "audience": "Who is your target audience?",
+    "tone": "What tone do you want? (e.g. professional, casual, informative, warm)",
+    "depth": "How deep should the research go? (standard / deep / comprehensive)",
+}
+
 if st.session_state.step >= 4:
     with st.expander("Step 4 — A few quick questions", expanded=st.session_state.step == 4):
-        agent = ClarificationAgent()
-        question = agent.get_next_question(
-            st.session_state.topic,
-            st.session_state.persona,
-            st.session_state.context_text,
-            st.session_state.answers,
+        # Find next unanswered field
+        next_field = next(
+            (f for f in _CLARIFICATION_QUESTIONS if f not in st.session_state.answers),
+            None,
         )
-        if question:
-            answer = st.text_input(question, key=f"q_{question[:20]}")
+        if next_field:
+            question_text = _CLARIFICATION_QUESTIONS[next_field]
+            answer = st.text_input(question_text, key=f"q_{next_field}")
             if st.button("Next →", key="clarify_next") and answer:
-                for field in ["audience", "tone", "depth"]:
-                    if field not in st.session_state.answers:
-                        st.session_state.answers[field] = answer
-                        break
+                st.session_state.answers[next_field] = answer
                 st.rerun()
         else:
             st.success("Brief complete. Ready to discover sources.")
+            agent = ClarificationAgent()
             if st.button("Discover sources →", key="step4"):
                 brief = agent.build_brief(
                     st.session_state.topic,
