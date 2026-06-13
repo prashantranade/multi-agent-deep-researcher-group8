@@ -46,6 +46,21 @@ def test_api_status_error_triggers_fallback():
     assert result == "fallback response"
     assert mock_call.call_count == 2
 
+def test_connection_error_triggers_fallback():
+    mock_response = MagicMock()
+    mock_response.choices[0].message.content = "fallback response"
+    with patch("infrastructure.llm_client._call_provider") as mock_call:
+        mock_call.side_effect = [
+            openai.APIConnectionError(request=MagicMock()),
+            mock_response,
+        ]
+        result = chat_with_fallback(
+            messages=[{"role": "user", "content": "hello"}],
+            model="claude-sonnet-4-6"
+        )
+    assert result == "fallback response"
+    assert mock_call.call_count == 2
+
 def test_both_providers_fail_raises_runtime_error():
     with patch("infrastructure.llm_client._call_provider") as mock_call:
         mock_call.side_effect = openai.RateLimitError(

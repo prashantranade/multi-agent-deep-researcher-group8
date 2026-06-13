@@ -35,7 +35,7 @@ def chat_with_fallback(messages: List[Dict[str, str]], model: str) -> str:
         try:
             response = _call_provider(provider, messages, model)
             return response.choices[0].message.content
-        except (openai.RateLimitError, openai.APIStatusError) as e:
+        except (openai.RateLimitError, openai.APIStatusError, openai.APIConnectionError) as e:
             last_error = e
             continue
     raise RuntimeError(f"All LLM providers exhausted. Last error: {last_error}")
