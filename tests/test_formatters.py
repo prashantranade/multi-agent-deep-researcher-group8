@@ -48,3 +48,14 @@ def test_export_all_artifacts():
     assert "brief" in result
     assert "captions" in result
     assert result["brief"] == "brief content"
+
+def test_export_all_artifacts_duplicate_types():
+    artifacts = [
+        {"type": "brief", "content": "first", "citations": []},
+        {"type": "brief", "content": "second", "citations": []},
+    ]
+    result = export_all_artifacts(artifacts)
+    assert "brief" in result
+    assert "brief_2" in result
+    assert result["brief"] == "first"
+    assert result["brief_2"] == "second"
