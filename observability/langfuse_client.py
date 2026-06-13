@@ -1,9 +1,18 @@
 # observability/langfuse_client.py
 import functools
-from langfuse.callback import CallbackHandler
+
+try:
+    from langfuse.callback import CallbackHandler
+    _LANGFUSE_AVAILABLE = True
+except ImportError:
+    CallbackHandler = None
+    _LANGFUSE_AVAILABLE = False
+
 import config
 
-def get_langfuse_handler(session_id: str, user_id: str = "anonymous") -> CallbackHandler:
+def get_langfuse_handler(session_id: str, user_id: str = "anonymous"):
+    if not _LANGFUSE_AVAILABLE:
+        return None
     return CallbackHandler(
         secret_key=config.LANGFUSE_SECRET_KEY,
         public_key=config.LANGFUSE_PUBLIC_KEY,
