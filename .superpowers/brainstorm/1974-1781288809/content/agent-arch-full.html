@@ -1,0 +1,119 @@
+<h2>Full agent architecture</h2>
+<p class="subtitle">Separate crews per persona, shared infrastructure layer</p>
+
+<div style="margin: 1.5rem 0;">
+
+  <div style="font-size: 11px; font-weight: 500; color: #5F5E5A; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px;">Shared intake layer</div>
+  <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 6px;">
+    <div style="background: #F1EFE8; border: 0.5px solid #B4B2A9; border-radius: 8px; padding: 10px 12px; text-align: center;">
+      <div style="font-size: 12px; font-weight: 500; color: #2C2C2A;">Persona selector</div>
+      <div style="font-size: 11px; color: #888780; margin-top: 2px;">routes to crew</div>
+    </div>
+    <div style="background: #F1EFE8; border: 0.5px solid #B4B2A9; border-radius: 8px; padding: 10px 12px; text-align: center;">
+      <div style="font-size: 12px; font-weight: 500; color: #2C2C2A;">Topic intake</div>
+      <div style="font-size: 11px; color: #888780; margin-top: 2px;">free text input</div>
+    </div>
+    <div style="background: #F1EFE8; border: 0.5px solid #B4B2A9; border-radius: 8px; padding: 10px 12px; text-align: center;">
+      <div style="font-size: 12px; font-weight: 500; color: #2C2C2A;">Context enrichment</div>
+      <div style="font-size: 11px; color: #888780; margin-top: 2px;">docs · URL · handle</div>
+    </div>
+    <div style="background: #F1EFE8; border: 0.5px solid #B4B2A9; border-radius: 8px; padding: 10px 12px; text-align: center;">
+      <div style="font-size: 12px; font-weight: 500; color: #2C2C2A;">Clarification agent</div>
+      <div style="font-size: 11px; color: #888780; margin-top: 2px;">builds brief</div>
+    </div>
+  </div>
+  <div style="text-align: center; font-size: 18px; color: #B4B2A9; margin: 4px 0;">↓</div>
+  <div style="background: #F1EFE8; border: 0.5px solid #B4B2A9; border-radius: 8px; padding: 10px 16px; text-align: center; margin-bottom: 4px;">
+    <div style="font-size: 12px; font-weight: 500; color: #2C2C2A;">Source discovery + confidence scoring → user selects sources + artifacts</div>
+  </div>
+  <div style="display: flex; justify-content: center; gap: 120px; font-size: 18px; color: #B4B2A9; margin: 8px 0;">
+    <span>↙</span><span>↘</span>
+  </div>
+
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+
+    <div style="border: 1.5px solid #85B7EB; border-radius: 10px; padding: 14px;">
+      <div style="font-size: 12px; font-weight: 500; color: #0C447C; margin-bottom: 10px; display: flex; align-items: center; gap: 6px;">
+        <div style="width: 8px; height: 8px; border-radius: 50%; background: #185FA5;"></div>
+        Content Creator crew
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 6px;">
+        <div style="background: #E6F1FB; border-radius: 6px; padding: 8px 10px;">
+          <div style="font-size: 12px; font-weight: 500; color: #0C447C;">CC Retrieval agent</div>
+          <div style="font-size: 11px; color: #378ADD; margin-top: 2px;">Social platforms · travel blogs · cultural sources · trend data</div>
+        </div>
+        <div style="text-align: center; font-size: 14px; color: #85B7EB;">↓</div>
+        <div style="background: #E6F1FB; border-radius: 6px; padding: 8px 10px;">
+          <div style="font-size: 12px; font-weight: 500; color: #0C447C;">CC Analysis agent</div>
+          <div style="font-size: 11px; color: #378ADD; margin-top: 2px;">What's resonating · narrative hooks · audience signals · tone mapping</div>
+        </div>
+        <div style="text-align: center; font-size: 14px; color: #85B7EB;">↓</div>
+        <div style="background: #E6F1FB; border-radius: 6px; padding: 8px 10px;">
+          <div style="font-size: 12px; font-weight: 500; color: #0C447C;">CC Output agent</div>
+          <div style="font-size: 11px; color: #378ADD; margin-top: 2px;">Content brief · social drafts · captions · hashtags · content calendar entry</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="border: 1.5px solid #5DCAA5; border-radius: 10px; padding: 14px;">
+      <div style="font-size: 12px; font-weight: 500; color: #085041; margin-bottom: 10px; display: flex; align-items: center; gap: 6px;">
+        <div style="width: 8px; height: 8px; border-radius: 50%; background: #0F6E56;"></div>
+        Product Manager crew
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 6px;">
+        <div style="background: #E1F5EE; border-radius: 6px; padding: 8px 10px;">
+          <div style="font-size: 12px; font-weight: 500; color: #085041;">PM Retrieval agent</div>
+          <div style="font-size: 11px; color: #1D9E75; margin-top: 2px;">Market reports · competitor sites · user forums · industry data · academic papers</div>
+        </div>
+        <div style="text-align: center; font-size: 14px; color: #5DCAA5;">↓</div>
+        <div style="background: #E1F5EE; border-radius: 6px; padding: 8px 10px;">
+          <div style="font-size: 12px; font-weight: 500; color: #085041;">PM Analysis agent</div>
+          <div style="font-size: 11px; color: #1D9E75; margin-top: 2px;">Market sizing · competitor gaps · user pain points · evidence validation · contradiction flagging</div>
+        </div>
+        <div style="text-align: center; font-size: 14px; color: #5DCAA5;">↓</div>
+        <div style="background: #E1F5EE; border-radius: 6px; padding: 8px 10px;">
+          <div style="font-size: 12px; font-weight: 500; color: #085041;">PM Output agent</div>
+          <div style="font-size: 11px; color: #1D9E75; margin-top: 2px;">Research brief · competitive summary · opportunity sizing · PRD-ready insights</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div style="font-size: 11px; font-weight: 500; color: #5F5E5A; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px;">Shared infrastructure (used by both crews)</div>
+  <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px;">
+    <div style="background: #FAEEDA; border: 0.5px solid #FAC775; border-radius: 8px; padding: 8px 10px; text-align: center;">
+      <div style="font-size: 11px; font-weight: 500; color: #412402;">URL scraper</div>
+    </div>
+    <div style="background: #FAEEDA; border: 0.5px solid #FAC775; border-radius: 8px; padding: 8px 10px; text-align: center;">
+      <div style="font-size: 11px; font-weight: 500; color: #412402;">PDF / doc parser</div>
+    </div>
+    <div style="background: #FAEEDA; border: 0.5px solid #FAC775; border-radius: 8px; padding: 8px 10px; text-align: center;">
+      <div style="font-size: 11px; font-weight: 500; color: #412402;">Image analyser</div>
+    </div>
+    <div style="background: #FAEEDA; border: 0.5px solid #FAC775; border-radius: 8px; padding: 8px 10px; text-align: center;">
+      <div style="font-size: 11px; font-weight: 500; color: #412402;">Confidence scorer</div>
+    </div>
+    <div style="background: #FAEEDA; border: 0.5px solid #FAC775; border-radius: 8px; padding: 8px 10px; text-align: center;">
+      <div style="font-size: 11px; font-weight: 500; color: #412402;">Vector store (RAG)</div>
+    </div>
+  </div>
+
+  <div style="margin-top: 10px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;">
+    <div style="background: #FAEEDA; border: 0.5px solid #FAC775; border-radius: 8px; padding: 8px 10px; text-align: center;">
+      <div style="font-size: 11px; font-weight: 500; color: #412402;">LangSmith tracing</div>
+    </div>
+    <div style="background: #FAEEDA; border: 0.5px solid #FAC775; border-radius: 8px; padding: 8px 10px; text-align: center;">
+      <div style="font-size: 11px; font-weight: 500; color: #412402;">Citation formatter</div>
+    </div>
+    <div style="background: #FAEEDA; border: 0.5px solid #FAC775; border-radius: 8px; padding: 8px 10px; text-align: center;">
+      <div style="font-size: 11px; font-weight: 500; color: #412402;">Artifact exporter</div>
+    </div>
+  </div>
+
+</div>
+
+<div style="margin-top: 1rem; padding: 1rem 1.25rem; background: #EEEDFE; border-radius: 8px; border-left: 3px solid #AFA9EC;">
+  <div style="font-size: 12px; font-weight: 500; color: #26215C; margin-bottom: 4px;">Adding a new persona later</div>
+  <div style="font-size: 13px; color: #534AB7;">Drop in a new crew (3 agents: retrieval · analysis · output). Wire it to the shared intake and infrastructure. No other changes needed — this is the plug-and-play promise.</div>
+</div>

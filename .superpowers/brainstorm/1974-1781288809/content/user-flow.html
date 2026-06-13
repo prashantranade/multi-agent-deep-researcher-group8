@@ -1,0 +1,87 @@
+<h2>User journey — Multi-Agent Deep Researcher</h2>
+<p class="subtitle">The guided intake flow before agents start working</p>
+
+<div style="margin: 2rem 0; display: flex; flex-direction: column; gap: 0;">
+
+  <div style="display: flex; align-items: flex-start; gap: 16px;">
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 0;">
+      <div style="width: 36px; height: 36px; border-radius: 50%; background: #CECBF6; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 500; color: #26215C; flex-shrink: 0;">1</div>
+      <div style="width: 2px; height: 48px; background: #EEEDFE;"></div>
+    </div>
+    <div style="padding-top: 6px;">
+      <div style="font-size: 15px; font-weight: 500; color: #26215C; margin-bottom: 4px;">Persona selection</div>
+      <div style="font-size: 13px; color: #5F5E5A;">User picks their role — Content Creator or Product Manager. Sets the agent crew and output options available.</div>
+    </div>
+  </div>
+
+  <div style="display: flex; align-items: flex-start; gap: 16px;">
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 0;">
+      <div style="width: 36px; height: 36px; border-radius: 50%; background: #CECBF6; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 500; color: #26215C; flex-shrink: 0;">2</div>
+      <div style="width: 2px; height: 48px; background: #EEEDFE;"></div>
+    </div>
+    <div style="padding-top: 6px;">
+      <div style="font-size: 15px; font-weight: 500; color: #26215C; margin-bottom: 4px;">Topic input</div>
+      <div style="font-size: 13px; color: #5F5E5A;">Free text — broad or specific. "Sustainable travel in Rajasthan" or "Gen Z buying behavior in India."</div>
+    </div>
+  </div>
+
+  <div style="display: flex; align-items: flex-start; gap: 16px;">
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 0;">
+      <div style="width: 36px; height: 36px; border-radius: 50%; background: #9FE1CB; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 500; color: #04342C; flex-shrink: 0;">3</div>
+      <div style="width: 2px; height: 64px; background: #E1F5EE;"></div>
+    </div>
+    <div style="padding-top: 6px;">
+      <div style="font-size: 15px; font-weight: 500; color: #04342C; margin-bottom: 4px;">Clarification loop <span style="font-size: 11px; font-weight: 400; background: #E1F5EE; color: #0F6E56; padding: 2px 8px; border-radius: 4px; margin-left: 6px;">lightweight agent</span></div>
+      <div style="font-size: 13px; color: #5F5E5A;">System asks targeted questions one at a time — audience, tone, angle, depth — until the brief is clear enough to proceed. User can skip at any point.</div>
+    </div>
+  </div>
+
+  <div style="display: flex; align-items: flex-start; gap: 16px;">
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 0;">
+      <div style="width: 36px; height: 36px; border-radius: 50%; background: #9FE1CB; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 500; color: #04342C; flex-shrink: 0;">4</div>
+      <div style="width: 2px; height: 64px; background: #E1F5EE;"></div>
+    </div>
+    <div style="padding-top: 6px;">
+      <div style="font-size: 15px; font-weight: 500; color: #04342C; margin-bottom: 4px;">Source curation <span style="font-size: 11px; font-weight: 400; background: #E1F5EE; color: #0F6E56; padding: 2px 8px; border-radius: 4px; margin-left: 6px;">pause point</span></div>
+      <div style="font-size: 13px; color: #5F5E5A;">System surfaces a curated list of vetted, relevant sources. User selects which ones to include. Agents only search within selected sources — no hallucinated citations.</div>
+    </div>
+  </div>
+
+  <div style="display: flex; align-items: flex-start; gap: 16px;">
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 0;">
+      <div style="width: 36px; height: 36px; border-radius: 50%; background: #CECBF6; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 500; color: #26215C; flex-shrink: 0;">5</div>
+      <div style="width: 2px; height: 48px; background: #EEEDFE;"></div>
+    </div>
+    <div style="padding-top: 6px;">
+      <div style="font-size: 15px; font-weight: 500; color: #26215C; margin-bottom: 4px;">Artifact selection</div>
+      <div style="font-size: 13px; color: #5F5E5A;">User picks what they want out — content brief, social draft, captions, hashtags, PM brief, competitive summary, etc. Only selected artifacts are generated.</div>
+    </div>
+  </div>
+
+  <div style="display: flex; align-items: flex-start; gap: 16px;">
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 0;">
+      <div style="width: 36px; height: 36px; border-radius: 50%; background: #AFA9EC; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 500; color: #26215C; flex-shrink: 0;">6</div>
+      <div style="width: 2px; height: 48px; background: #EEEDFE;"></div>
+    </div>
+    <div style="padding-top: 6px;">
+      <div style="font-size: 15px; font-weight: 500; color: #26215C; margin-bottom: 4px;">Agent crew runs <span style="font-size: 11px; font-weight: 400; background: #EEEDFE; color: #3C3489; padding: 2px 8px; border-radius: 4px; margin-left: 6px;">LangGraph orchestration</span></div>
+      <div style="font-size: 13px; color: #5F5E5A;">Retrieval → Analysis → Synthesis → Report Builder agents run in sequence, only against selected sources, only producing selected artifacts.</div>
+    </div>
+  </div>
+
+  <div style="display: flex; align-items: flex-start; gap: 16px;">
+    <div style="display: flex; flex-direction: column; align-items: center;">
+      <div style="width: 36px; height: 36px; border-radius: 50%; background: #534AB7; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 500; color: #EEEDFE; flex-shrink: 0;">7</div>
+    </div>
+    <div style="padding-top: 6px;">
+      <div style="font-size: 15px; font-weight: 500; color: #26215C; margin-bottom: 4px;">Structured output delivered</div>
+      <div style="font-size: 13px; color: #5F5E5A;">Clean, persona-specific artifacts with source citations. Downloadable. Ready to use.</div>
+    </div>
+  </div>
+
+</div>
+
+<div style="margin-top: 2rem; padding: 1rem 1.25rem; background: #F1EFE8; border-radius: 8px; border-left: 3px solid #888780;">
+  <div style="font-size: 12px; font-weight: 500; color: #444441; margin-bottom: 4px;">Key architectural insight</div>
+  <div style="font-size: 13px; color: #5F5E5A;">Steps 1–5 are cheap (one lightweight intake agent). The heavy retrieval + synthesis agents only fire at step 6, against a well-scoped brief. This minimises cost and maximises output quality.</div>
+</div>
