@@ -1,7 +1,7 @@
 # tests/test_vector_store.py
 import pytest
 from unittest.mock import patch, MagicMock
-from infrastructure.vector_store import VectorStore
+from infrastructure.vector_store import VectorStore, _table_names
 
 @pytest.fixture
 def mock_store(tmp_path):
@@ -41,6 +41,6 @@ def test_drop_table(mock_store):
         metadatas=[{"source": "x"}],
         table_name="temp_table",
     )
-    assert "temp_table" in mock_store.db.list_tables().tables
+    assert "temp_table" in _table_names(mock_store.db)
     mock_store.drop_table("temp_table")
-    assert "temp_table" not in mock_store.db.list_tables().tables
+    assert "temp_table" not in _table_names(mock_store.db)

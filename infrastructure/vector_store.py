@@ -4,6 +4,16 @@ from typing import List, Dict, Optional, Any
 from langchain_openai import OpenAIEmbeddings
 import config
 
+
+def _table_names(db) -> list:
+    """Normalize list_tables() return value across lancedb versions.
+
+    Older versions return a plain list; newer versions return a
+    ListTablesResponse object with a `.tables` attribute.
+    """
+    result = db.list_tables()
+    return result.tables if hasattr(result, "tables") else list(result)
+
 class VectorStore:
     def __init__(self, db_path: str = None):
         self.db = lancedb.connect(db_path or config.LANCEDB_PATH)
@@ -15,7 +25,7 @@ class VectorStore:
             {"text": t, "vector": v, "metadata": m}
             for t, v, m in zip(texts, vectors, metadatas)
         ]
-        if table_name in self.db.list_tables().tables:
+        if table_name in _table_names(self.db):
             tbl = self.db.open_table(table_name)
             tbl.add(data)
         else:
@@ -38,5 +48,5 @@ class VectorStore:
         return [{"text": r["text"], "metadata": r["metadata"]} for r in results]
 
     def drop_table(self, table_name: str) -> None:
-        if table_name in self.db.list_tables().tables:
+        if table_name in _table_names(self.db):
             self.db.drop_table(table_name)
