@@ -1,9 +1,7 @@
 # tests/test_cc_e2e.py
 from unittest.mock import patch
-from crews.base_crew import ResearchBrief
-from crews.content_creator.retrieval_agent import CCRetrievalAgent
-from crews.content_creator.analysis_agent import CCAnalysisAgent
-from crews.content_creator.output_agent import CCOutputAgent
+from crews.base_crew import ResearchBrief, CrewOutput
+from crews.content_creator.crew import ContentCreatorCrew
 
 
 def test_cc_crew_full_pipeline(tmp_path):
@@ -39,14 +37,11 @@ def test_cc_crew_full_pipeline(tmp_path):
         mock_analysis_llm.return_value = analysis_json
         mock_output_llm.return_value = "Generated content"
 
-        retrieval = CCRetrievalAgent(db_path=str(tmp_path))
-        analysis = CCAnalysisAgent()
-        output = CCOutputAgent()
+        crew = ContentCreatorCrew(db_path=str(tmp_path))
+        result = crew.run(brief)
+        artifacts = result.artifacts
 
-        retrieved = retrieval.retrieve(brief, brief.selected_sources)
-        analysed = analysis.analyse(retrieved)
-        artifacts = output.generate_artifacts(analysed, brief.selected_artifacts)
-
+    assert isinstance(result, CrewOutput)
     assert len(artifacts) == 2
     types = [a["type"] for a in artifacts]
     assert "content_brief" in types

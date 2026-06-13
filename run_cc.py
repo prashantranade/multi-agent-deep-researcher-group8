@@ -2,9 +2,7 @@
 """Run Content Creator crew from the command line."""
 
 from crews.base_crew import ResearchBrief
-from crews.content_creator.retrieval_agent import CCRetrievalAgent
-from crews.content_creator.analysis_agent import CCAnalysisAgent
-from crews.content_creator.output_agent import CCOutputAgent
+from crews.content_creator.crew import ContentCreatorCrew
 from infrastructure.artifact_exporter import export_artifact
 
 # ── EDIT THESE ──────────────────────────────────────────────
@@ -72,23 +70,13 @@ def main():
         selected_artifacts=ARTIFACTS,
     )
 
-    retrieval = CCRetrievalAgent()
-    analysis = CCAnalysisAgent()
-    output = CCOutputAgent()
+    crew = ContentCreatorCrew()
 
-    print("Step 1/3: Retrieving...")
-    retrieved = retrieval.retrieve(brief, brief.selected_sources)
-    print(f"  → {len(retrieved)} chunks retrieved")
+    print("Running Content Creator crew...")
+    result = crew.run(brief)
+    print(f"  → {len(result.artifacts)} artifacts generated")
 
-    print("Step 2/3: Analyzing...")
-    analysed = analysis.analyse(retrieved)
-    print(f"  → trends: {analysed.get('trends', [])}")
-    print(f"  → hooks: {analysed.get('hooks', [])}")
-
-    print("Step 3/3: Generating artifacts...")
-    artifacts = output.generate_artifacts(analysed, brief.selected_artifacts)
-
-    for artifact in artifacts:
+    for artifact in result.artifacts:
         print("\n" + "=" * 60)
         print(artifact["type"].replace("_", " ").upper())
         print("=" * 60)

@@ -1,9 +1,7 @@
 # tests/test_pm_e2e.py
 from unittest.mock import patch
-from crews.base_crew import ResearchBrief
-from crews.product_manager.retrieval_agent import PMRetrievalAgent
-from crews.product_manager.analysis_agent import PMAnalysisAgent
-from crews.product_manager.output_agent import PMOutputAgent
+from crews.base_crew import ResearchBrief, CrewOutput
+from crews.product_manager.crew import ProductManagerCrew
 
 
 def test_pm_crew_full_pipeline(tmp_path):
@@ -32,14 +30,11 @@ def test_pm_crew_full_pipeline(tmp_path):
         mock_analysis_llm.return_value = '{"market_size": "large", "competitors": ["BookMyTrip"], "user_pain_points": ["cost", "trust"], "opportunity": "high", "contradictions": [], "key_data_points": ["20% YoY growth"]}'
         mock_output_llm.return_value = "Generated PM content"
 
-        retrieval = PMRetrievalAgent(db_path=str(tmp_path))
-        analysis = PMAnalysisAgent()
-        output = PMOutputAgent()
+        crew = ProductManagerCrew(db_path=str(tmp_path))
+        result = crew.run(brief)
+        artifacts = result.artifacts
 
-        retrieved = retrieval.retrieve(brief, brief.selected_sources)
-        analysed = analysis.analyse(retrieved)
-        artifacts = output.generate_artifacts(analysed, brief.selected_artifacts)
-
+    assert isinstance(result, CrewOutput)
     assert len(artifacts) == 2
     types = [a["type"] for a in artifacts]
     assert "research_brief" in types
@@ -69,10 +64,11 @@ def test_pm_crew_single_artifact(tmp_path):
         mock_analysis_llm.return_value = '{"market_size": "medium", "competitors": [], "user_pain_points": ["affordability"], "opportunity": "underserved rural segment", "contradictions": [], "key_data_points": []}'
         mock_output_llm.return_value = "## User Problems\n- Problem: affordability"
 
-        retrieved = PMRetrievalAgent(db_path=str(tmp_path)).retrieve(brief, brief.selected_sources)
-        analysed = PMAnalysisAgent().analyse(retrieved)
-        artifacts = PMOutputAgent().generate_artifacts(analysed, brief.selected_artifacts)
+        crew = ProductManagerCrew(db_path=str(tmp_path))
+        result = crew.run(brief)
+        artifacts = result.artifacts
 
+    assert isinstance(result, CrewOutput)
     assert len(artifacts) == 1
     assert artifacts[0]["type"] == "prd_insights"
     assert "affordability" in artifacts[0]["content"]
