@@ -2,7 +2,8 @@
 import json
 import re
 from typing import List, Dict, Any
-from infrastructure.llm_client import chat_with_fallback
+from langchain_core.messages import SystemMessage, HumanMessage
+from infrastructure.llm_client import get_llm
 import config
 
 
@@ -31,10 +32,12 @@ class PMAnalysisAgent:
     def analyse(self, retrieved: List[Dict[str, Any]]) -> Dict[str, Any]:
         context = "\n\n".join(r["text"] for r in retrieved[:8])
         messages = [
-            {"role": "system", "content": _SYSTEM},
-            {"role": "user", "content": f"Research excerpts:\n{context}\n\nAnalyse for product strategy:"},
+            SystemMessage(content=_SYSTEM),
+            HumanMessage(content=f"Research excerpts:\n{context}\n\nAnalyse for product strategy:"),
         ]
-        raw = chat_with_fallback(messages=messages, model=self.model)
+        llm = get_llm(self.model)
+        response = llm.invoke(messages)
+        raw = response.content
         try:
             return _parse_json_response(raw)
         except (json.JSONDecodeError, ValueError):
@@ -46,3 +49,4 @@ class PMAnalysisAgent:
                 "contradictions": [],
                 "key_data_points": [],
             }
+

@@ -2,7 +2,8 @@
 import json
 import re
 from typing import List, Dict, Any
-from infrastructure.llm_client import chat_with_fallback
+from langchain_core.messages import SystemMessage, HumanMessage
+from infrastructure.llm_client import get_llm
 import config
 
 _SYSTEM = """You are a content strategy analyst. Given research excerpts, identify:
@@ -26,17 +27,20 @@ class CCAnalysisAgent:
     def analyse(self, retrieved: List[Dict[str, Any]]) -> Dict[str, Any]:
         context = "\n\n".join(r["text"] for r in retrieved[:8])
         messages = [
-            {"role": "system", "content": _SYSTEM},
-            {"role": "user", "content": f"Research excerpts:\n{context}\n\nAnalyse for content strategy:"},
+            SystemMessage(content=_SYSTEM),
+            HumanMessage(content=f"Research excerpts:\n{context}\n\nAnalyse for content strategy:"),
         ]
-        response = chat_with_fallback(messages, model=config.ANALYSIS_MODEL)
+        llm = get_llm(config.ANALYSIS_MODEL)
+        response = llm.invoke(messages)
+        raw = response.content
         try:
-            return _parse_json(response)
+            return _parse_json(raw)
         except (json.JSONDecodeError, ValueError):
             return {
                 "trends": [],
                 "hooks": [],
                 "audience_signals": [],
-                "tone_notes": response,
+                "tone_notes": raw,
                 "key_facts": [],
             }
+

@@ -1,5 +1,6 @@
 # tests/test_cc_analysis.py
-from unittest.mock import patch
+from unittest.mock import patch, MagicMock
+from langchain_core.messages import AIMessage
 from crews.content_creator.analysis_agent import CCAnalysisAgent
 
 
@@ -9,8 +10,10 @@ def test_cc_analysis_returns_dict():
         '"audience_signals": ["millennials prefer authentic"], "tone_notes": "inspirational", '
         '"key_facts": []}'
     )
-    with patch("crews.content_creator.analysis_agent.chat_with_fallback") as mock_llm:
-        mock_llm.return_value = analysis_json
+    with patch("crews.content_creator.analysis_agent.get_llm") as mock_get_llm:
+        mock_llm = MagicMock()
+        mock_llm.invoke.return_value = AIMessage(content=analysis_json)
+        mock_get_llm.return_value = mock_llm
         agent = CCAnalysisAgent()
         retrieved = [{
             "text": "Rajasthan eco tourism is growing among millennials",
@@ -20,3 +23,4 @@ def test_cc_analysis_returns_dict():
     assert "trends" in result
     assert "hooks" in result
     assert isinstance(result["hooks"], list)
+

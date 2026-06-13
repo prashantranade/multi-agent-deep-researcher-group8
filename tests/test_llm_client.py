@@ -1,79 +1,40 @@
 # tests/test_llm_client.py
 import pytest
 from unittest.mock import patch, MagicMock
-import openai
-from infrastructure.llm_client import chat_with_fallback, _call_provider, _PROVIDERS
+from langchain_openai import ChatOpenAI
+from langchain_core.runnables import RunnableWithFallbacks
+from langchain_core.messages import AIMessage
+from infrastructure.llm_client import get_llm, chat_with_fallback
 
-def test_primary_succeeds_no_fallback():
-    mock_response = MagicMock()
-    mock_response.choices[0].message.content = "primary response"
-    with patch("infrastructure.llm_client._call_provider") as mock_call:
-        mock_call.return_value = mock_response
+def test_get_llm_returns_runnable_with_fallbacks():
+    llm = get_llm("test-model")
+    assert isinstance(llm, RunnableWithFallbacks)
+    
+    # Check primary
+    assert isinstance(llm.runnable, ChatOpenAI)
+    assert llm.runnable.model_name == "test-model"
+    assert llm.runnable.openai_api_base == "https://openrouter.ai/api/v1"
+    
+    # Check fallback
+    assert len(llm.fallbacks) == 1
+    fallback = llm.fallbacks[0]
+    assert isinstance(fallback, ChatOpenAI)
+    assert fallback.model_name == "glm-4-air"
+    assert fallback.openai_api_base == "https://open.bigmodel.cn/api/paas/v4/"
+
+def test_chat_with_fallback_invokes_llm():
+    mock_response = AIMessage(content="test response")
+    with patch("infrastructure.llm_client.get_llm") as mock_get_llm:
+        mock_llm = MagicMock()
+        mock_llm.invoke.return_value = mock_response
+        mock_get_llm.return_value = mock_llm
+        
         result = chat_with_fallback(
             messages=[{"role": "user", "content": "hello"}],
-            model="claude-sonnet-4-6"
+            model="test-model"
         )
-    assert result == "primary response"
-    assert mock_call.call_count == 1
+        
+    assert result == "test response"
+    mock_get_llm.assert_called_once_with("test-model")
+    mock_llm.invoke.assert_called_once()
 
-def test_primary_rate_limit_triggers_fallback():
-    mock_response = MagicMock()
-    mock_response.choices[0].message.content = "fallback response"
-    with patch("infrastructure.llm_client._call_provider") as mock_call:
-        mock_call.side_effect = [
-            openai.RateLimitError("rate limit", response=MagicMock(), body={}),
-            mock_response,
-        ]
-        result = chat_with_fallback(
-            messages=[{"role": "user", "content": "hello"}],
-            model="claude-sonnet-4-6"
-        )
-    assert result == "fallback response"
-    assert mock_call.call_count == 2
-
-def test_api_status_error_triggers_fallback():
-    mock_response = MagicMock()
-    mock_response.choices[0].message.content = "fallback response"
-    with patch("infrastructure.llm_client._call_provider") as mock_call:
-        mock_call.side_effect = [
-            openai.APIStatusError("server error", response=MagicMock(), body={}),
-            mock_response,
-        ]
-        result = chat_with_fallback(
-            messages=[{"role": "user", "content": "hello"}],
-            model="claude-sonnet-4-6"
-        )
-    assert result == "fallback response"
-    assert mock_call.call_count == 2
-
-def test_connection_error_triggers_fallback():
-    mock_response = MagicMock()
-    mock_response.choices[0].message.content = "fallback response"
-    with patch("infrastructure.llm_client._call_provider") as mock_call:
-        mock_call.side_effect = [
-            openai.APIConnectionError(request=MagicMock()),
-            mock_response,
-        ]
-        result = chat_with_fallback(
-            messages=[{"role": "user", "content": "hello"}],
-            model="claude-sonnet-4-6"
-        )
-    assert result == "fallback response"
-    assert mock_call.call_count == 2
-
-def test_both_providers_fail_raises_runtime_error():
-    with patch("infrastructure.llm_client._call_provider") as mock_call:
-        mock_call.side_effect = openai.RateLimitError(
-            "rate limit", response=MagicMock(), body={}
-        )
-        with pytest.raises(RuntimeError, match="All LLM providers exhausted"):
-            chat_with_fallback(
-                messages=[{"role": "user", "content": "hello"}],
-                model="claude-sonnet-4-6"
-            )
-
-def test_providers_config():
-    assert len(_PROVIDERS) == 2
-    assert _PROVIDERS[0]["name"] == "openrouter"
-    assert _PROVIDERS[1]["name"] == "zai"
-    assert _PROVIDERS[1]["model_override"] == "glm-4-air"
