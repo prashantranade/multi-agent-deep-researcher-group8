@@ -139,3 +139,88 @@ def test_lancedb_tables_are_isolated(tmp_path):
 
     finally:
         config.LANCEDB_PATH = original_path
+
+def _make_mock_crew_output(artifact_types):
+    from crews.base_crew import CrewOutput
+    return CrewOutput(
+        artifacts=[{"type": t, "content": f"Mock content for {t}", "citations": []} for t in artifact_types]
+    )
+
+def test_e2e_content_creator_pipeline():
+    from crews.router import get_crew
+    from crews.base_crew import ResearchBrief, CrewOutput
+
+    brief = ResearchBrief(
+        topic="AI trends in 2025",
+        persona="content_creator",
+        audience="tech professionals",
+        tone="informative",
+        depth="standard",
+        selected_artifacts=["blog_post", "social_post"],
+    )
+    mock_output = _make_mock_crew_output(["blog_post", "social_post"])
+
+    with patch("crews.router.ContentCreatorCrew") as mock_class:
+        mock_instance = MagicMock()
+        mock_instance.run.return_value = mock_output
+        mock_class.return_value = mock_instance
+        crew = get_crew("content_creator")
+        output = crew.run(brief)
+
+    assert isinstance(output, CrewOutput)
+    types = [a["type"] for a in output.artifacts]
+    assert "blog_post" in types
+    assert "social_post" in types
+
+def test_e2e_product_manager_pipeline():
+    from crews.router import get_crew
+    from crews.base_crew import ResearchBrief, CrewOutput
+
+    brief = ResearchBrief(
+        topic="CRM software market 2025",
+        persona="product_manager",
+        audience="B2B SaaS executives",
+        tone="analytical",
+        depth="deep",
+        selected_artifacts=["competitive_analysis", "executive_summary"],
+    )
+    mock_output = _make_mock_crew_output(["competitive_analysis", "executive_summary"])
+
+    with patch("crews.router.ProductManagerCrew") as mock_class:
+        mock_instance = MagicMock()
+        mock_instance.run.return_value = mock_output
+        mock_class.return_value = mock_instance
+        crew = get_crew("product_manager")
+        output = crew.run(brief)
+
+    assert isinstance(output, CrewOutput)
+    types = [a["type"] for a in output.artifacts]
+    assert "competitive_analysis" in types
+    assert "executive_summary" in types
+
+def test_e2e_bharat_desha_pipeline():
+    from crews.router import get_crew
+    from crews.base_crew import ResearchBrief, CrewOutput
+
+    brief = ResearchBrief(
+        topic="Rishikesh yoga retreat",
+        persona="bharat_desha",
+        audience="solo spiritual travellers",
+        tone="warm",
+        depth="standard",
+        selected_artifacts=["blog_post", "instagram", "seo_keywords"],
+    )
+    mock_output = _make_mock_crew_output(["seo_keywords", "blog_post", "instagram"])
+
+    with patch("crews.router.BharatDeshaCrew") as mock_class:
+        mock_instance = MagicMock()
+        mock_instance.run.return_value = mock_output
+        mock_class.return_value = mock_instance
+        crew = get_crew("bharat_desha")
+        output = crew.run(brief)
+
+    assert isinstance(output, CrewOutput)
+    types = [a["type"] for a in output.artifacts]
+    assert "blog_post" in types
+    assert "instagram" in types
+    assert "seo_keywords" in types
