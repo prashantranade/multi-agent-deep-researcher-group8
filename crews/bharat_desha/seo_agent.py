@@ -38,4 +38,15 @@ Return only valid JSON. No markdown, no explanation."""
         model=config.INTAKE_MODEL,
     )
 
-    return json.loads(response)
+    try:
+        text = response.strip()
+        if text.startswith("```"):
+            import re
+            text = re.sub(r"^```(?:json)?\s*", "", text)
+            text = re.sub(r"\s*```$", "", text.strip())
+        return json.loads(text)
+    except (json.JSONDecodeError, ValueError):
+        return {
+            "keywords": [{"keyword": topic, "intent": "informational"}],
+            "primary_keyword": topic,
+        }

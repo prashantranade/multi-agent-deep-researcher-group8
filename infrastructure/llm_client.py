@@ -34,7 +34,7 @@ def chat_with_fallback(messages: List[Dict[str, str]], model: str) -> str:
     for provider in _PROVIDERS:
         try:
             response = _call_provider(provider, messages, model)
-            return response.choices[0].message.content
+            return response.choices[0].message.content or ""
         except (openai.RateLimitError, openai.APIStatusError, openai.APIConnectionError) as e:
             last_error = e
             continue

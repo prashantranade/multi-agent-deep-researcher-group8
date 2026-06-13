@@ -36,4 +36,16 @@ Return only valid JSON. No markdown, no explanation."""
         model=config.INTAKE_MODEL,
     )
 
-    return json.loads(response)
+    try:
+        text = response.strip()
+        if text.startswith("```"):
+            import re
+            text = re.sub(r"^```(?:json)?\s*", "", text)
+            text = re.sub(r"\s*```$", "", text.strip())
+        return json.loads(text)
+    except (json.JSONDecodeError, ValueError):
+        return {
+            "trends": [response] if response else [],
+            "seasonality": {"best_months": [], "avoid_months": [], "active_festivals": [], "advisories": []},
+            "topic_suggestions": [topic],
+        }
