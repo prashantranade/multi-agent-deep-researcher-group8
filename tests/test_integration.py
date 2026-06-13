@@ -50,6 +50,23 @@ def test_persona_selector_includes_bharat_desha():
     assert "youtube" in bd["artifacts"]
     assert "seo_keywords" in bd["always_included"]
 
+def test_artifact_renderer_handles_all_types():
+    from ui.artifact_renderer import get_render_config
+
+    artifact_types = [
+        "blog_post", "itinerary", "destination_guide", "wellness_guide",
+        "instagram", "facebook", "x_post", "youtube",
+        "seo_keywords", "content_brief", "competitive_analysis",
+        "product_roadmap", "user_research", "executive_summary", "social_post", "newsletter"
+    ]
+
+    for artifact_type in artifact_types:
+        config = get_render_config(artifact_type)
+        assert "label" in config, f"Missing label for {artifact_type}"
+        assert "display" in config, f"Missing display for {artifact_type}"
+        assert config["display"] in ("markdown", "text_box", "sections"), \
+            f"Unknown display type for {artifact_type}: {config['display']}"
+
 def test_router_raises_for_unknown_persona():
     from crews.router import get_crew
     import pytest
