@@ -16,6 +16,7 @@ def trace_agent_run(agent_name: str):
     def decorator(fn):
         @functools.wraps(fn)
         def wrapper(*args, **kwargs):
+            # TODO: attach LangFuse span when session_id is available in context
             return fn(*args, **kwargs)
         return wrapper
     return decorator
