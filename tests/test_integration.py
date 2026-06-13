@@ -35,6 +35,21 @@ def test_router_returns_correct_crew_for_each_persona():
         mock_pm.assert_called_once()
         mock_bd.assert_called_once()
 
+def test_persona_selector_includes_bharat_desha():
+    from intake.persona_selector import PERSONAS
+
+    assert "bharat_desha" in PERSONAS
+    bd = PERSONAS["bharat_desha"]
+    assert "label" in bd
+    assert "description" in bd
+    assert "artifacts" in bd
+    assert "always_included" in bd
+    assert "blog_post" in bd["artifacts"]
+    assert "instagram" in bd["artifacts"]
+    assert "x_post" in bd["artifacts"]
+    assert "youtube" in bd["artifacts"]
+    assert "seo_keywords" in bd["always_included"]
+
 def test_router_raises_for_unknown_persona():
     from crews.router import get_crew
     import pytest
