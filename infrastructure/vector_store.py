@@ -15,7 +15,7 @@ class VectorStore:
             {"text": t, "vector": v, "metadata": m}
             for t, v, m in zip(texts, vectors, metadatas)
         ]
-        if table_name in self.db.table_names():
+        if table_name in self.db.list_tables().tables:
             tbl = self.db.open_table(table_name)
             tbl.add(data)
         else:
@@ -28,7 +28,7 @@ class VectorStore:
         k: int = 5,
         filter_source: Optional[str] = None,
     ) -> List[Dict[str, Any]]:
-        if table_name not in self.db.table_names():
+        if table_name not in self.db.list_tables().tables:
             return []
         query_vector = self.embeddings.embed_query(query)
         tbl = self.db.open_table(table_name)
@@ -38,5 +38,5 @@ class VectorStore:
         return [{"text": r["text"], "metadata": r["metadata"]} for r in results]
 
     def drop_table(self, table_name: str) -> None:
-        if table_name in self.db.table_names():
+        if table_name in self.db.list_tables().tables:
             self.db.drop_table(table_name)

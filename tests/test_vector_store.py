@@ -41,6 +41,6 @@ def test_drop_table(mock_store):
         metadatas=[{"source": "x"}],
         table_name="temp_table",
     )
-    assert "temp_table" in mock_store.db.table_names()
+    assert "temp_table" in mock_store.db.list_tables().tables
     mock_store.drop_table("temp_table")
-    assert "temp_table" not in mock_store.db.table_names()
+    assert "temp_table" not in mock_store.db.list_tables().tables
