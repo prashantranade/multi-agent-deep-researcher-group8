@@ -83,3 +83,33 @@ def test_seo_agent_returns_ten_keywords():
     assert len(result["keywords"]) == 10
     assert "primary_keyword" in result
     assert all("keyword" in k and "intent" in k for k in result["keywords"])
+
+
+def test_retrieval_agent_returns_chunks():
+    from crews.bharat_desha.retrieval_agent import run_retrieval_agent
+
+    mock_tavily = MagicMock()
+    mock_tavily.search.return_value = {
+        "results": [
+            {"url": "https://example.com/varanasi", "title": "Varanasi Guide", "content": "Varanasi is the spiritual capital of India..."},
+        ]
+    }
+
+    mock_vector_store = MagicMock()
+    mock_vector_store.search.return_value = [
+        {"text": "Varanasi is the spiritual capital of India...", "metadata": {"source": "https://example.com/varanasi"}}
+    ]
+
+    seo_context = {
+        "keywords": [{"keyword": "Varanasi spiritual tour", "intent": "informational"}],
+        "primary_keyword": "Varanasi spiritual tour"
+    }
+
+    with patch("crews.bharat_desha.retrieval_agent.TavilyClient", return_value=mock_tavily), \
+         patch("crews.bharat_desha.retrieval_agent.VectorStore", return_value=mock_vector_store):
+        result = run_retrieval_agent("Varanasi spiritual tour", seo_context)
+
+    assert isinstance(result, list)
+    assert len(result) > 0
+    assert "text" in result[0]
+    assert "metadata" in result[0]
