@@ -95,3 +95,47 @@ def test_app_imports_router_and_renderer():
     except Exception as e:
         if "crews.router" in str(e) or "ui.artifact_renderer" in str(e):
             raise
+
+def test_lancedb_tables_are_isolated(tmp_path):
+    """Each crew writes to its own table — no cross-contamination."""
+    import config
+    from infrastructure.vector_store import VectorStore
+
+    original_path = config.LANCEDB_PATH
+    config.LANCEDB_PATH = str(tmp_path / "test_lancedb")
+
+    try:
+        store = VectorStore(db_path=config.LANCEDB_PATH)
+
+        store.add_texts(
+            ["Content creator article about marketing"],
+            [{"source": "https://cc.example.com"}],
+            "content_creator"
+        )
+        store.add_texts(
+            ["Product manager roadmap for Q3"],
+            [{"source": "https://pm.example.com"}],
+            "product_manager"
+        )
+        store.add_texts(
+            ["Varanasi spiritual tour guide"],
+            [{"source": "https://bd.example.com"}],
+            "bharat_desha"
+        )
+
+        cc_results = store.search("marketing content", "content_creator", k=5)
+        pm_results = store.search("product roadmap", "product_manager", k=5)
+        bd_results = store.search("Varanasi spiritual", "bharat_desha", k=5)
+
+        assert len(cc_results) > 0
+        assert len(pm_results) > 0
+        assert len(bd_results) > 0
+
+        # Cross-check: bharat_desha table should not contain content_creator text
+        bd_all = store.search("marketing content creator", "bharat_desha", k=5)
+        cc_texts = [r["text"] for r in cc_results]
+        bd_texts = [r["text"] for r in bd_all]
+        assert not any(t in bd_texts for t in cc_texts), "Tables are not isolated!"
+
+    finally:
+        config.LANCEDB_PATH = original_path
