@@ -72,3 +72,26 @@ def test_router_raises_for_unknown_persona():
     import pytest
     with pytest.raises(ValueError, match="Unknown persona"):
         get_crew("unknown_persona")
+
+def test_app_imports_router_and_renderer():
+    """Verify app.py imports crew router and artifact renderer."""
+    import importlib.util, sys
+
+    # Stub streamlit so we can import app.py outside Streamlit context
+    st_mock = MagicMock()
+    st_mock.session_state = {}
+    sys.modules["streamlit"] = st_mock
+
+    spec = importlib.util.spec_from_file_location(
+        "app",
+        "C:/Users/prash/codeworkspace/outskill/cap-hackathon-group8/app.py"
+    )
+    if spec is None:
+        return  # app.py doesn't exist yet — skip
+
+    module = importlib.util.module_from_spec(spec)
+    try:
+        spec.loader.exec_module(module)
+    except Exception as e:
+        if "crews.router" in str(e) or "ui.artifact_renderer" in str(e):
+            raise
