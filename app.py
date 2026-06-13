@@ -10,41 +10,9 @@ from source_engine.scraper import scrape_selected_sources
 from infrastructure.vector_store import VectorStore
 from infrastructure.artifact_exporter import export_artifact
 from observability.langfuse_client import get_langfuse_handler
+from crews.router import get_crew
+from ui.artifact_renderer import render_artifact
 import config
-
-# Lazy import crews so squads can work independently
-def _load_crew(persona: str):
-    if persona == "content_creator":
-        from crews.content_creator.retrieval_agent import CCRetrievalAgent
-        from crews.content_creator.analysis_agent import CCAnalysisAgent
-        from crews.content_creator.output_agent import CCOutputAgent
-        class CCCrew:
-            def __init__(self):
-                self.retrieval = CCRetrievalAgent()
-                self.analysis = CCAnalysisAgent()
-                self.output = CCOutputAgent()
-            def run(self, brief):
-                retrieved = self.retrieval.retrieve(brief, brief.selected_sources)
-                analysis = self.analysis.analyse(retrieved)
-                return self.output.generate_artifacts(analysis, brief.selected_artifacts)
-        return CCCrew()
-    elif persona == "product_manager":
-        from crews.product_manager.retrieval_agent import PMRetrievalAgent
-        from crews.product_manager.analysis_agent import PMAnalysisAgent
-        from crews.product_manager.output_agent import PMOutputAgent
-        class PMCrew:
-            def __init__(self):
-                self.retrieval = PMRetrievalAgent()
-                self.analysis = PMAnalysisAgent()
-                self.output = PMOutputAgent()
-            def run(self, brief):
-                retrieved = self.retrieval.retrieve(brief, brief.selected_sources)
-                analysis = self.analysis.analyse(retrieved)
-                return self.output.generate_artifacts(analysis, brief.selected_artifacts)
-        return PMCrew()
-    elif persona == "bharat_desha":
-        from crews.bharat_desha.crew import BharatDeshaCrew
-        return BharatDeshaCrew()
 
 st.set_page_config(page_title="Deep Researcher", layout="wide")
 st.title("Multi-Agent Deep Researcher")
@@ -189,16 +157,17 @@ if st.session_state.step >= 7:
         if "artifacts" not in st.session_state:
             with st.spinner("Agent crew working... (this takes 30–60 seconds)"):
                 try:
-                    crew = _load_crew(st.session_state.persona)
-                    artifacts = crew.run(st.session_state.brief)
-                    st.session_state.artifacts = artifacts
+                    session_id = st.session_state.session_id
+                    langfuse_handler = get_langfuse_handler(session_id=session_id, user_id="demo")
+                    crew = get_crew(st.session_state.persona)
+                    output = crew.run(st.session_state.brief)
+                    st.session_state.artifacts = output.artifacts
                 except Exception as e:
                     st.error(f"Agent error: {e}")
                     st.stop()
         for artifact in st.session_state.get("artifacts", []):
-            st.subheader(artifact["type"].replace("_", " ").title())
+            render_artifact(artifact)
             exported = export_artifact(artifact)
-            st.markdown(exported)
             st.download_button(
                 f"Download {artifact['type']}",
                 exported,
