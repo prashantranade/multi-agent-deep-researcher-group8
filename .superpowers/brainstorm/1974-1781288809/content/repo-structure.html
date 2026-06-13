@@ -1,0 +1,84 @@
+<h2>Repo structure — parallel development</h2>
+<p class="subtitle">8 people, 4 squads, near-zero merge conflicts</p>
+
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 1.5rem 0;">
+
+  <div style="background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1rem 1.25rem;">
+    <div style="font-size: 11px; font-weight: 500; color: #888780; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.05em;">Squad 1 — Intake</div>
+    <div style="font-family: monospace; font-size: 12px; line-height: 2; color: #185FA5;">
+      <div>intake/</div>
+      <div style="padding-left: 16px; color: #378ADD;">├── persona_selector.py</div>
+      <div style="padding-left: 16px; color: #378ADD;">├── topic_intake.py</div>
+      <div style="padding-left: 16px; color: #378ADD;">├── context_enrichment.py</div>
+      <div style="padding-left: 16px; color: #378ADD;">└── clarification_agent.py</div>
+      <div style="margin-top: 4px;">source_engine/</div>
+      <div style="padding-left: 16px; color: #378ADD;">├── discovery.py</div>
+      <div style="padding-left: 16px; color: #378ADD;">├── scraper.py</div>
+      <div style="padding-left: 16px; color: #378ADD;">└── confidence_scorer.py</div>
+      <div style="margin-top: 4px; color: #378ADD;">app.py</div>
+    </div>
+    <div style="margin-top: 10px; font-size: 11px; color: #5F5E5A; border-top: 0.5px solid var(--color-border-tertiary); padding-top: 8px;">2 people · owns the full user journey + Streamlit UI</div>
+  </div>
+
+  <div style="background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1rem 1.25rem;">
+    <div style="font-size: 11px; font-weight: 500; color: #888780; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.05em;">Squad 2 — Infrastructure</div>
+    <div style="font-family: monospace; font-size: 12px; line-height: 2; color: #854F0B;">
+      <div>infrastructure/</div>
+      <div style="padding-left: 16px; color: #BA7517;">├── vector_store.py</div>
+      <div style="padding-left: 16px; color: #BA7517;">├── pdf_parser.py</div>
+      <div style="padding-left: 16px; color: #BA7517;">├── image_analyser.py</div>
+      <div style="padding-left: 16px; color: #BA7517;">├── citation_formatter.py</div>
+      <div style="padding-left: 16px; color: #BA7517;">└── artifact_exporter.py</div>
+      <div style="margin-top: 4px;">observability/</div>
+      <div style="padding-left: 16px; color: #BA7517;">└── langfuse_client.py</div>
+      <div style="margin-top: 4px; color: #BA7517;">config.py</div>
+    </div>
+    <div style="margin-top: 10px; font-size: 11px; color: #5F5E5A; border-top: 0.5px solid var(--color-border-tertiary); padding-top: 8px;">2 people · ships first — unblocks all other squads</div>
+  </div>
+
+  <div style="background: var(--color-background-primary); border: 1.5px solid #85B7EB; border-radius: var(--border-radius-lg); padding: 1rem 1.25rem;">
+    <div style="font-size: 11px; font-weight: 500; color: #0C447C; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.05em;">Squad 3 — Content Creator crew</div>
+    <div style="font-family: monospace; font-size: 12px; line-height: 2; color: #185FA5;">
+      <div>crews/</div>
+      <div style="padding-left: 16px;">├── base_crew.py <span style="font-family: sans-serif; font-size: 10px; background: #E6F1FB; color: #0C447C; padding: 1px 6px; border-radius: 4px;">shared contract</span></div>
+      <div style="padding-left: 16px;">└── content_creator/</div>
+      <div style="padding-left: 32px; color: #378ADD;">├── retrieval_agent.py</div>
+      <div style="padding-left: 32px; color: #378ADD;">├── analysis_agent.py</div>
+      <div style="padding-left: 32px; color: #378ADD;">└── output_agent.py</div>
+      <div style="margin-top: 4px;">outputs/content_creator/</div>
+      <div style="padding-left: 16px; color: #378ADD;">└── templates/</div>
+    </div>
+    <div style="margin-top: 10px; font-size: 11px; color: #5F5E5A; border-top: 0.5px solid #85B7EB; padding-top: 8px;">2 people · social sources · trend analysis · content artifacts</div>
+  </div>
+
+  <div style="background: var(--color-background-primary); border: 1.5px solid #5DCAA5; border-radius: var(--border-radius-lg); padding: 1rem 1.25rem;">
+    <div style="font-size: 11px; font-weight: 500; color: #085041; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.05em;">Squad 4 — Product Manager crew</div>
+    <div style="font-family: monospace; font-size: 12px; line-height: 2; color: #0F6E56;">
+      <div>crews/</div>
+      <div style="padding-left: 16px;">└── product_manager/</div>
+      <div style="padding-left: 32px; color: #1D9E75;">├── retrieval_agent.py</div>
+      <div style="padding-left: 32px; color: #1D9E75;">├── analysis_agent.py</div>
+      <div style="padding-left: 32px; color: #1D9E75;">└── output_agent.py</div>
+      <div style="margin-top: 4px;">outputs/product_manager/</div>
+      <div style="padding-left: 16px; color: #1D9E75;">└── templates/</div>
+    </div>
+    <div style="margin-top: 10px; font-size: 11px; color: #5F5E5A; border-top: 0.5px solid #5DCAA5; padding-top: 8px;">2 people · market sources · evidence analysis · PM artifacts</div>
+  </div>
+
+</div>
+
+<div style="background: #EEEDFE; border-radius: var(--border-radius-lg); padding: 1rem 1.25rem; margin-bottom: 12px;">
+  <div style="font-size: 12px; font-weight: 500; color: #26215C; margin-bottom: 6px;">base_crew.py — the plug-and-play contract</div>
+  <div style="font-family: monospace; font-size: 12px; color: #534AB7; line-height: 1.8;">
+    <div>class BaseCrew:</div>
+    <div style="padding-left: 16px;">def retrieve(self, brief, sources): ...</div>
+    <div style="padding-left: 16px;">def analyse(self, retrieved): ...</div>
+    <div style="padding-left: 16px;">def generate_artifacts(self, analysis, selected): ...</div>
+  </div>
+  <div style="font-size: 11px; color: #534AB7; margin-top: 8px;">Adding BharatDesha persona later = new folder under crews/ + subclass BaseCrew. Nothing else changes.</div>
+</div>
+
+<div style="background: #F1EFE8; border-radius: var(--border-radius-lg); padding: 1rem 1.25rem;">
+  <div style="font-size: 12px; font-weight: 500; color: #2C2C2A; margin-bottom: 4px;">Integration point</div>
+  <div style="font-size: 13px; color: #5F5E5A;">One person owns <span style="font-family: monospace; font-size: 12px; background: #D3D1C7; padding: 1px 5px; border-radius: 3px;">app.py</span> — wires all squads together on Sunday morning. Squads expose clean interfaces, integration is mechanical not creative.</div>
+</div>

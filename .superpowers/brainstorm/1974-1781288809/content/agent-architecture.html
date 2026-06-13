@@ -1,0 +1,83 @@
+<h2>Agent crew architecture — A vs B</h2>
+<p class="subtitle">Click your preferred approach</p>
+
+<div class="options">
+
+  <div class="option" data-choice="a" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>Shared core, persona output</h3>
+      <p>One agent crew handles intake, retrieval, and analysis. At the final stage, a persona-specific output agent shapes the results for Content Creator vs Product Manager.</p>
+
+      <div style="margin: 16px 0; font-family: monospace; font-size: 12px; background: #F1EFE8; border-radius: 6px; padding: 12px; line-height: 2;">
+        <div style="color: #5F5E5A;">[ Intake Agent ] → [ Retrieval Agent ] → [ Analysis Agent ]</div>
+        <div style="color: #5F5E5A; padding-left: 40px;">↓</div>
+        <div style="display: flex; gap: 16px; padding-left: 20px;">
+          <div style="color: #185FA5;">[ Content Creator Output Agent ]</div>
+          <div style="color: #0F6E56;">[ Product Manager Output Agent ]</div>
+        </div>
+      </div>
+
+      <div class="pros-cons">
+        <div class="pros">
+          <h4>Pros</h4>
+          <ul>
+            <li>Simpler to build — one retrieval + analysis pipeline</li>
+            <li>Less duplication — core agents maintained once</li>
+            <li>Adding a new persona = adding one output agent only</li>
+            <li>Easier to test — core pipeline is persona-agnostic</li>
+            <li>Lower token cost — shared retrieval runs once</li>
+          </ul>
+        </div>
+        <div class="cons">
+          <h4>Cons</h4>
+          <ul>
+            <li>Analysis is generic — not tuned to what each persona actually needs</li>
+            <li>A PM needs competitive framing; a creator needs narrative hooks — shared analysis misses this</li>
+            <li>Output agent carries too much responsibility</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="b" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>Fully separate crews per persona</h3>
+      <p>Each persona has its own end-to-end agent crew — different retrieval strategy, different analysis lens, different output format. No shared agents.</p>
+
+      <div style="margin: 16px 0; font-family: monospace; font-size: 12px; background: #F1EFE8; border-radius: 6px; padding: 12px; line-height: 2;">
+        <div style="color: #185FA5;">Content Creator: [ CC Retrieval ] → [ CC Analysis ] → [ CC Output ]</div>
+        <div style="color: #0F6E56;">Product Manager: [ PM Retrieval ] → [ PM Analysis ] → [ PM Output ]</div>
+      </div>
+
+      <div class="pros-cons">
+        <div class="pros">
+          <h4>Pros</h4>
+          <ul>
+            <li>Each crew is perfectly tuned — retrieval sources, analysis depth, and output format all match the persona</li>
+            <li>CC crew searches social/cultural sources; PM crew searches market/industry sources</li>
+            <li>Teams can build in parallel — no coordination on shared agents</li>
+            <li>Failures are isolated — one crew breaking doesn't affect the other</li>
+          </ul>
+        </div>
+        <div class="cons">
+          <h4>Cons</h4>
+          <ul>
+            <li>More to build — double the agents</li>
+            <li>Duplication in retrieval logic that's actually the same</li>
+            <li>Adding a new persona = building an entire new crew</li>
+            <li>Higher risk of inconsistent quality across crews</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div style="margin-top: 1.5rem; padding: 1rem 1.25rem; background: #EEEDFE; border-radius: 8px; border-left: 3px solid #AFA9EC;">
+  <div style="font-size: 12px; font-weight: 500; color: #26215C; margin-bottom: 4px;">The real question</div>
+  <div style="font-size: 13px; color: #534AB7;">Is the difference between personas mainly in <em>how results are presented</em> (favours A), or in <em>what gets retrieved and how it's analysed</em> (favours B)? A content creator researching "Gen Z travel" needs different sources and a different analytical lens than a PM researching the same topic.</div>
+</div>

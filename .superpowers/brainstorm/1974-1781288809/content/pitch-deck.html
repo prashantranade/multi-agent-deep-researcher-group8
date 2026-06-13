@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Multi-Agent Deep Researcher — Group Pitch</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f4f0; color: #2C2C2A; zoom: 1.25; }
+
+  .slide { min-height: 100vh; padding: 48px 64px; display: flex; flex-direction: column; justify-content: center; border-bottom: 2px solid #D3D1C7; }
+  .slide:last-child { border-bottom: none; }
+
+  .slide-label { font-size: 11px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: #888780; margin-bottom: 16px; }
+  .slide-title { font-size: 32px; font-weight: 500; color: #2C2C2A; margin-bottom: 8px; line-height: 1.2; }
+  .slide-sub { font-size: 16px; color: #5F5E5A; margin-bottom: 32px; line-height: 1.6; }
+
+  .hero { background: #26215C; color: #EEEDFE; }
+  .hero .slide-label { color: #7F77DD; }
+  .hero .slide-title { color: #EEEDFE; font-size: 40px; }
+  .hero .slide-sub { color: #AFA9EC; }
+
+  .tag { display: inline-block; font-size: 11px; font-weight: 500; padding: 3px 10px; border-radius: 20px; margin: 2px; }
+  .tag-blue { background: #E6F1FB; color: #0C447C; }
+  .tag-green { background: #E1F5EE; color: #085041; }
+  .tag-amber { background: #FAEEDA; color: #412402; }
+  .tag-purple { background: #EEEDFE; color: #26215C; }
+  .tag-gray { background: #F1EFE8; color: #444441; }
+
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+  .grid-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 12px; }
+
+  .card { background: white; border: 0.5px solid #D3D1C7; border-radius: 12px; padding: 16px 20px; }
+  .card-blue { border-left: 3px solid #185FA5; }
+  .card-green { border-left: 3px solid #0F6E56; }
+  .card-amber { border-left: 3px solid #BA7517; }
+  .card-purple { border-left: 3px solid #534AB7; }
+
+  .card h3 { font-size: 14px; font-weight: 500; margin-bottom: 6px; }
+  .card p { font-size: 12px; color: #5F5E5A; line-height: 1.6; }
+  .card ul { font-size: 12px; color: #5F5E5A; line-height: 1.8; padding-left: 14px; }
+
+  .step { display: flex; gap: 16px; align-items: flex-start; margin-bottom: 20px; }
+  .step-num { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 500; flex-shrink: 0; margin-top: 2px; }
+  .step-num-purple { background: #CECBF6; color: #26215C; }
+  .step-num-green { background: #9FE1CB; color: #04342C; }
+  .step-num-amber { background: #FAC775; color: #412402; }
+  .step-body h4 { font-size: 14px; font-weight: 500; margin-bottom: 3px; }
+  .step-body p { font-size: 12px; color: #5F5E5A; line-height: 1.6; }
+
+  .crew-box { border-radius: 10px; padding: 16px; }
+  .crew-blue { background: #E6F1FB; border: 1.5px solid #85B7EB; }
+  .crew-green { background: #E1F5EE; border: 1.5px solid #5DCAA5; }
+  .crew-box h3 { font-size: 13px; font-weight: 500; margin-bottom: 10px; }
+  .agent { background: white; border-radius: 6px; padding: 8px 10px; margin-bottom: 6px; }
+  .agent-name { font-size: 12px; font-weight: 500; }
+  .agent-desc { font-size: 11px; color: #5F5E5A; margin-top: 2px; }
+
+  .infra-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+  .infra-item { background: #FAEEDA; border: 0.5px solid #FAC775; border-radius: 8px; padding: 8px; text-align: center; font-size: 11px; font-weight: 500; color: #412402; }
+
+  .stack-row { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 0.5px solid #D3D1C7; }
+  .stack-row:last-child { border-bottom: none; }
+  .stack-layer { font-size: 11px; font-weight: 500; color: #888780; width: 140px; flex-shrink: 0; }
+  .stack-choice { font-size: 13px; font-weight: 500; color: #2C2C2A; }
+  .stack-why { font-size: 11px; color: #5F5E5A; margin-left: auto; text-align: right; max-width: 280px; }
+
+  .squad-card { background: white; border: 0.5px solid #D3D1C7; border-radius: 10px; padding: 14px 16px; }
+  .squad-label { font-size: 10px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px; }
+  .squad-files { font-family: monospace; font-size: 11px; line-height: 1.9; color: #5F5E5A; }
+  .squad-note { font-size: 11px; color: #888780; margin-top: 8px; padding-top: 8px; border-top: 0.5px solid #D3D1C7; }
+
+  .loom-step { background: white; border-radius: 10px; padding: 14px 16px; border: 0.5px solid #D3D1C7; margin-bottom: 10px; display: flex; gap: 14px; align-items: flex-start; }
+  .loom-time { font-size: 11px; font-weight: 500; color: #534AB7; background: #EEEDFE; padding: 3px 8px; border-radius: 4px; flex-shrink: 0; margin-top: 2px; }
+  .loom-title { font-size: 13px; font-weight: 500; color: #2C2C2A; margin-bottom: 3px; }
+  .loom-desc { font-size: 12px; color: #5F5E5A; line-height: 1.5; }
+
+  .nav { position: fixed; top: 20px; right: 20px; display: flex; flex-direction: column; gap: 6px; z-index: 100; }
+  .nav-dot { width: 8px; height: 8px; border-radius: 50%; background: #D3D1C7; cursor: pointer; transition: background 0.2s; }
+  .nav-dot:hover { background: #534AB7; }
+  .nav-dot a { display: block; width: 100%; height: 100%; }
+</style>
+</head>
+<body>
+
+<nav class="nav" aria-label="Slide navigation">
+  <a href="#slide1"><div class="nav-dot" title="Title"></div></a>
+  <a href="#slide2"><div class="nav-dot" title="Why this project"></div></a>
+  <a href="#slide3"><div class="nav-dot" title="User journey"></div></a>
+  <a href="#slide4"><div class="nav-dot" title="Agent architecture"></div></a>
+  <a href="#slide5"><div class="nav-dot" title="Tech stack"></div></a>
+  <a href="#slide6"><div class="nav-dot" title="Team split"></div></a>
+  <a href="#slide7"><div class="nav-dot" title="Demo arc"></div></a>
+  <a href="#slide8"><div class="nav-dot" title="Folder structure"></div></a>
+  <a href="#slide9"><div class="nav-dot" title="Implementation plan"></div></a>
+  <a href="#slide10"><div class="nav-dot" title="Design decisions"></div></a>
+  <a href="#slide11"><div class="nav-dot" title="Extensibility roadmap"></div></a>
+</nav>
+
+<!-- SLIDE 1: HERO -->
+<section class="slide hero" id="slide1">
+  <div class="slide-label">Hackathon · Group 8 · Design document + demo</div>
+  <div class="slide-title">Multi-Agent Deep Researcher</div>
+  <div class="slide-sub" style="max-width: 600px;">A multimodal research assistant that understands who you are, finds the right sources, and produces persona-specific research artifacts — in under 2 minutes.</div>
+  <div style="margin-top: 24px; display: flex; gap: 10px; flex-wrap: wrap;">
+    <span class="tag" style="background: #3C3489; color: #CECBF6;">Content Creator</span>
+    <span class="tag" style="background: #3C3489; color: #CECBF6;">Product Manager</span>
+    <span class="tag" style="background: #3C3489; color: #CECBF6;">+ extensible to any persona</span>
+  </div>
+  <div style="margin-top: 32px; background: rgba(255,255,255,0.07); border-radius: 8px; padding: 14px 18px; max-width: 560px; border-left: 3px solid #7F77DD;">
+    <div style="font-size: 12px; color: #AFA9EC; font-weight: 500; margin-bottom: 4px;">How to read this deck</div>
+    <div style="font-size: 12px; color: #7F77DD; line-height: 1.7;">This is not just a pitch — it is a living design document. It covers requirement analysis, architecture decisions with rationale, implementation plan, and extensibility roadmap. Built to be shared with the Outskill evaluation team alongside the working product and Loom demo.</div>
+  </div>
+  <div style="margin-top: 24px; font-size: 13px; color: #7F77DD;">Scroll to explore the full design ↓</div>
+</section>
+
+<!-- SLIDE 2: WHY THIS PROJECT -->
+<section class="slide" id="slide2">
+  <div class="slide-label">Why this project</div>
+  <div class="slide-title">Four reasons this wins</div>
+  <div class="slide-sub">Evaluated against: 5-min Loom demo · interview story · buildability · post-hackathon value</div>
+
+  <div class="grid-2">
+    <div class="card card-purple">
+      <h3>Full accelerator stack</h3>
+      <p>LangGraph · LangChain · LlamaIndex · RAG · multi-agent orchestration · MCP-style tool use. Every concept from the program in one project.</p>
+    </div>
+    <div class="card card-blue">
+      <h3>Compelling Loom demo</h3>
+      <p>Watch agents work in real time — sources surface, confidence scores appear, a structured research brief materialises in 60 seconds. Visual, fast, immediately understandable.</p>
+    </div>
+    <div class="card card-green">
+      <h3>Broad audience appeal</h3>
+      <p>Content creators, PMs, analysts, founders — everyone does research. No domain explanation needed. Any judge gets it in 10 seconds.</p>
+    </div>
+    <div class="card card-amber">
+      <h3>Keep using it after Sunday</h3>
+      <p>Designed to extend — add BharatDesha as a third persona, point it at any domain. It's a product, not a demo that gets archived Monday.</p>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 3: USER JOURNEY -->
+<section class="slide" id="slide3">
+  <div class="slide-label">User journey</div>
+  <div class="slide-title">8 steps, 2 human decisions</div>
+  <div class="slide-sub">The system does the heavy lifting. Users decide sources and artifacts — nothing else.</div>
+
+  <div class="grid-2">
+    <div>
+      <div class="step">
+        <div class="step-num step-num-purple">1</div>
+        <div class="step-body"><h4>Persona selection</h4><p>Content Creator or Product Manager. Routes to the right agent crew.</p></div>
+      </div>
+      <div class="step">
+        <div class="step-num step-num-purple">2</div>
+        <div class="step-body"><h4>Topic input</h4><p>Free text — broad or specific. The system handles both.</p></div>
+      </div>
+      <div class="step">
+        <div class="step-num step-num-amber">3</div>
+        <div class="step-body"><h4>Context enrichment <span class="tag tag-amber">optional</span></h4><p>Upload PDFs, images, docs · paste a social handle · drop a website URL. Multimodal. Enriches the brief without replacing source discovery.</p></div>
+      </div>
+      <div class="step">
+        <div class="step-num step-num-green">4</div>
+        <div class="step-body"><h4>Clarification loop <span class="tag tag-green">lightweight agent</span></h4><p>Targeted questions one at a time. Skips what context already answered. Stops when brief is clear.</p></div>
+      </div>
+    </div>
+    <div>
+      <div class="step">
+        <div class="step-num step-num-green">5</div>
+        <div class="step-body"><h4>Source curation <span class="tag tag-green">human decision 1</span></h4><p>System surfaces vetted candidates with confidence parameters (recency · domain authority · relevance · cross-validation). User sets threshold and selects sources.</p></div>
+      </div>
+      <div class="step">
+        <div class="step-num step-num-purple">6</div>
+        <div class="step-body"><h4>Artifact selection <span class="tag tag-purple">human decision 2</span></h4><p>Pick what you want out. Only selected artifacts are generated — no waste, lower cost.</p></div>
+      </div>
+      <div class="step">
+        <div class="step-num step-num-purple">7</div>
+        <div class="step-body"><h4>Agent crew runs</h4><p>LangGraph orchestration. Retrieval → Analysis → Output. Only against selected sources.</p></div>
+      </div>
+      <div class="step">
+        <div class="step-num step-num-purple">8</div>
+        <div class="step-body"><h4>Structured output delivered</h4><p>Persona-specific artifacts with citations. Context-aware — reflects your voice, audience, gaps.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 4: AGENT ARCHITECTURE -->
+<section class="slide" id="slide4">
+  <div class="slide-label">Agent architecture</div>
+  <div class="slide-title">Separate crews, shared infrastructure</div>
+  <div class="slide-sub">Each persona gets a tuned crew. Every crew shares the same underlying tools.</div>
+
+  <div class="grid-2" style="margin-bottom: 16px;">
+    <div class="crew-box crew-blue">
+      <h3 style="color: #0C447C;">Content Creator crew</h3>
+      <div class="agent">
+        <div class="agent-name" style="color: #185FA5;">CC Retrieval agent</div>
+        <div class="agent-desc">Social platforms · travel blogs · cultural sources · trend data</div>
+      </div>
+      <div class="agent">
+        <div class="agent-name" style="color: #185FA5;">CC Analysis agent</div>
+        <div class="agent-desc">What's resonating · narrative hooks · audience signals · tone mapping</div>
+      </div>
+      <div class="agent">
+        <div class="agent-name" style="color: #185FA5;">CC Output agent</div>
+        <div class="agent-desc">Content brief · social drafts · captions · hashtags · calendar entry</div>
+      </div>
+    </div>
+    <div class="crew-box crew-green">
+      <h3 style="color: #085041;">Product Manager crew</h3>
+      <div class="agent">
+        <div class="agent-name" style="color: #0F6E56;">PM Retrieval agent</div>
+        <div class="agent-desc">Market reports · competitor sites · user forums · industry data</div>
+      </div>
+      <div class="agent">
+        <div class="agent-name" style="color: #0F6E56;">PM Analysis agent</div>
+        <div class="agent-desc">Market sizing · competitor gaps · user pain points · contradiction flagging</div>
+      </div>
+      <div class="agent">
+        <div class="agent-name" style="color: #0F6E56;">PM Output agent</div>
+        <div class="agent-desc">Research brief · competitive summary · opportunity sizing · PRD insights</div>
+      </div>
+    </div>
+  </div>
+
+  <div style="margin-bottom: 8px; font-size: 11px; font-weight: 500; color: #888780; text-transform: uppercase; letter-spacing: 0.05em;">Shared infrastructure</div>
+  <div class="infra-grid">
+    <div class="infra-item">URL scraper<br><span style="font-weight: 400; color: #BA7517;">BeautifulSoup</span></div>
+    <div class="infra-item">Web discovery<br><span style="font-weight: 400; color: #BA7517;">Tavily API</span></div>
+    <div class="infra-item">PDF + doc parser</div>
+    <div class="infra-item">Image analyser</div>
+    <div class="infra-item">Vector store<br><span style="font-weight: 400; color: #BA7517;">LanceDB</span></div>
+    <div class="infra-item">Confidence scorer</div>
+    <div class="infra-item">Citation formatter</div>
+    <div class="infra-item">Observability<br><span style="font-weight: 400; color: #BA7517;">LangFuse cloud</span></div>
+  </div>
+
+  <div style="margin-top: 12px; background: #EEEDFE; border-radius: 8px; padding: 12px 16px;">
+    <div style="font-size: 12px; font-weight: 500; color: #26215C; margin-bottom: 4px;">Plug-and-play promise</div>
+    <div style="font-size: 12px; color: #534AB7;">Adding a new persona = 3 new agents (retrieval · analysis · output) + subclass BaseCrew. Shared infrastructure unchanged. BharatDesha is next.</div>
+  </div>
+</section>
+
+<!-- SLIDE 5: TECH STACK -->
+<section class="slide" id="slide5">
+  <div class="slide-label">Tech stack</div>
+  <div class="slide-title">Every choice has a reason</div>
+  <div class="slide-sub">No exotic picks. Familiar tools, deliberate decisions.</div>
+
+  <div class="card" style="margin-bottom: 0;">
+    <div class="stack-row">
+      <div class="stack-layer">Orchestration</div>
+      <div class="stack-choice">LangGraph</div>
+      <div class="stack-why">Stateful multi-agent workflows with branching + loops</div>
+    </div>
+    <div class="stack-row">
+      <div class="stack-layer">LLM framework</div>
+      <div class="stack-choice">LangChain + LlamaIndex</div>
+      <div class="stack-why">LangChain for agent wiring · LlamaIndex for RAG pipelines</div>
+    </div>
+    <div class="stack-row">
+      <div class="stack-layer">LLM models</div>
+      <div class="stack-choice">OpenAI-compatible interface · model routing</div>
+      <div class="stack-why">Fast/cheap model for intake · powerful model for analysis · user can swap</div>
+    </div>
+    <div class="stack-row">
+      <div class="stack-layer">Vector DB</div>
+      <div class="stack-choice">LanceDB</div>
+      <div class="stack-why">Team already knows it · native multimodal · serverless</div>
+    </div>
+    <div class="stack-row">
+      <div class="stack-layer">Web discovery</div>
+      <div class="stack-choice">Tavily API</div>
+      <div class="stack-why">Purpose-built for AI agents · clean structured results · free tier</div>
+    </div>
+    <div class="stack-row">
+      <div class="stack-layer">Deep scraping</div>
+      <div class="stack-choice">BeautifulSoup + requests</div>
+      <div class="stack-why">Runs only on user-selected URLs · no API dependency</div>
+    </div>
+    <div class="stack-row">
+      <div class="stack-layer">LLM fallback</div>
+      <div class="stack-choice">OpenRouter → Z.ai GLM-4.5-Air</div>
+      <div class="stack-why">Rate limit resilience · same OpenAI-compatible interface · Z.ai free tier as safety net</div>
+    </div>
+    <div class="stack-row">
+      <div class="stack-layer">Observability</div>
+      <div class="stack-choice">LangFuse (cloud free tier)</div>
+      <div class="stack-why">Open-source · drop-in LangChain integration · zero ops</div>
+    </div>
+    <div class="stack-row">
+      <div class="stack-layer">Frontend</div>
+      <div class="stack-choice">Streamlit</div>
+      <div class="stack-why">Multi-step flows + file upload + dynamic UI · production-ready in hours</div>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 6: TEAM SPLIT -->
+<section class="slide" id="slide6">
+  <div class="slide-label">Team split</div>
+  <div class="slide-title">4 squads · 2 people each · near-zero conflicts</div>
+  <div class="slide-sub">Each squad owns a folder. Integration happens once, Sunday morning, in app.py.</div>
+
+  <div class="grid-2">
+    <div class="squad-card">
+      <div class="squad-label" style="color: #185FA5;">Squad 1 — Intake</div>
+      <div class="squad-files">
+        intake/ · source_engine/ · app.py
+      </div>
+      <div class="squad-note">Owns the full user journey + Streamlit UI. Can use mock crew responses while other squads build.</div>
+    </div>
+    <div class="squad-card">
+      <div class="squad-label" style="color: #854F0B;">Squad 2 — Infrastructure</div>
+      <div class="squad-files">
+        infrastructure/ · observability/ · config.py
+      </div>
+      <div class="squad-note">Ships first — LanceDB, parsers, LangFuse, Tavily wrappers. Unblocks all other squads by Friday night.</div>
+    </div>
+    <div class="squad-card" style="border: 1px solid #85B7EB;">
+      <div class="squad-label" style="color: #0C447C;">Squad 3 — Content Creator crew</div>
+      <div class="squad-files">
+        crews/content_creator/ · outputs/content_creator/
+      </div>
+      <div class="squad-note">Builds against BaseCrew interface. Social sources, trend analysis, content artifacts.</div>
+    </div>
+    <div class="squad-card" style="border: 1px solid #5DCAA5;">
+      <div class="squad-label" style="color: #085041;">Squad 4 — Product Manager crew</div>
+      <div class="squad-files">
+        crews/product_manager/ · outputs/product_manager/
+      </div>
+      <div class="squad-note">Builds against BaseCrew interface. Market sources, evidence analysis, PM artifacts.</div>
+    </div>
+  </div>
+
+  <div style="margin-top: 16px; background: #F1EFE8; border-radius: 8px; padding: 12px 16px; display: flex; gap: 32px;">
+    <div>
+      <div style="font-size: 11px; font-weight: 500; color: #444441; margin-bottom: 4px;">Friday evening</div>
+      <div style="font-size: 12px; color: #5F5E5A;">Repo setup · squad assignments · Squad 2 starts shipping tools</div>
+    </div>
+    <div>
+      <div style="font-size: 11px; font-weight: 500; color: #444441; margin-bottom: 4px;">Saturday</div>
+      <div style="font-size: 12px; color: #5F5E5A;">All squads build in parallel · end-of-day integration checkpoint</div>
+    </div>
+    <div>
+      <div style="font-size: 11px; font-weight: 500; color: #444441; margin-bottom: 4px;">Sunday morning</div>
+      <div style="font-size: 12px; color: #5F5E5A;">Final integration in app.py · Loom recording by 1pm</div>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 7: DEMO ARC -->
+<section class="slide" id="slide7">
+  <div class="slide-label">5-minute Loom arc</div>
+  <div class="slide-title">The story we tell on camera</div>
+  <div class="slide-sub">Use BharatDesha as the live demo topic — real use case, authentic energy, no fake data.</div>
+
+  <div class="loom-step">
+    <div class="loom-time">0:00–0:30</div>
+    <div><div class="loom-title">The problem</div><div class="loom-desc">Research takes hours. You read 20 sources, cross-check facts, synthesise insights, write it up. We automate that entire workflow with specialised AI agents — in under 2 minutes.</div></div>
+  </div>
+  <div class="loom-step">
+    <div class="loom-time">0:30–1:00</div>
+    <div><div class="loom-title">Persona + topic</div><div class="loom-desc">Select Content Creator. Type: "Sustainable travel experiences in Rajasthan for millennial travellers." Upload BharatDesha URL as context.</div></div>
+  </div>
+  <div class="loom-step">
+    <div class="loom-time">1:00–1:45</div>
+    <div><div class="loom-title">Clarification + source curation</div><div class="loom-desc">System asks 2 targeted questions (it already knows the audience from the URL). Sources surface with confidence scores — recency, domain authority, relevance. User selects 5.</div></div>
+  </div>
+  <div class="loom-step">
+    <div class="loom-time">1:45–2:15</div>
+    <div><div class="loom-title">Artifact selection + agents run</div><div class="loom-desc">Select: content brief + 3 social captions + hashtag pack. Watch the agent crew work in real time via LangFuse trace — retrieval → analysis → output.</div></div>
+  </div>
+  <div class="loom-step">
+    <div class="loom-time">2:15–3:30</div>
+    <div><div class="loom-title">Output reveal</div><div class="loom-desc">Structured content brief with cited sources. Three ready-to-post captions tuned to BharatDesha's voice. Hashtag pack. All generated from verified sources, no hallucination.</div></div>
+  </div>
+  <div class="loom-step">
+    <div class="loom-time">3:30–4:15</div>
+    <div><div class="loom-title">Switch persona — same topic, different lens</div><div class="loom-desc">Switch to Product Manager. Same topic. Watch it produce a market opportunity brief instead — competitor landscape, user pain points, PRD-ready insights. Same infrastructure, different crew.</div></div>
+  </div>
+  <div class="loom-step">
+    <div class="loom-time">4:15–5:00</div>
+    <div><div class="loom-title">Architecture + extensibility</div><div class="loom-desc">Show the BaseCrew interface. "Adding a new persona is 3 agents and a subclass. BharatDesha is next. This is a platform, not a demo."</div></div>
+  </div>
+
+  <div style="margin-top: 16px; background: #26215C; border-radius: 8px; padding: 14px 20px;">
+    <div style="font-size: 13px; color: #EEEDFE; font-weight: 500;">The closing line</div>
+    <div style="font-size: 13px; color: #AFA9EC; margin-top: 4px; line-height: 1.6;">"We didn't build a research chatbot. We built a research platform — persona-aware, source-verified, multimodal, and extensible. This is what AI-native tooling looks like when engineers who understand production systems design it."</div>
+  </div>
+</section>
+
+<!-- SLIDE 8: FOLDER STRUCTURE -->
+<section class="slide" id="slide8">
+  <div class="slide-label">Folder structure</div>
+  <div class="slide-title">One repo · four squads · clear ownership</div>
+  <div class="slide-sub">Every squad owns exactly one folder. Merge conflicts are near-zero by design.</div>
+
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: start;">
+
+    <div style="background: #1e1e1e; border-radius: 12px; padding: 20px 24px; font-family: monospace; font-size: 12px; line-height: 2;">
+      <div style="color: #888; margin-bottom: 8px; font-size: 11px;">deep-researcher/</div>
+      <div style="color: #ccc;">├── <span style="color: #888780;">app.py</span></div>
+      <div style="color: #ccc;">├── <span style="color: #888780;">config.py</span> <span style="color: #534AB7; font-size: 10px;">← env-aware</span></div>
+      <div style="color: #ccc;">├── <span style="color: #888780;">requirements.txt</span></div>
+      <div style="color: #ccc;">├── <span style="color: #FAC775;">Dockerfile</span></div>
+      <div style="color: #ccc;">├── <span style="color: #FAC775;">docker-compose.yml</span></div>
+      <div style="color: #ccc;">├── <span style="color: #FAC775;">.env.local.example</span> <span style="color: #534AB7; font-size: 10px;">← committed</span></div>
+      <div style="color: #ccc;">├── <span style="color: #FAC775;">.env.production.example</span> <span style="color: #534AB7; font-size: 10px;">← committed</span></div>
+      <div style="color: #888; font-size: 10px; padding-left: 4px;">    .env.local · .env.production  ← gitignored, never committed</div>
+      <div style="color: #ccc;">├── <span style="color: #FAC775;">.streamlit/config.toml</span></div>
+      <div style="color: #ccc; margin-top: 6px;">├── <span style="color: #60AAEC; font-weight: 500;">intake/</span></div>
+      <div style="color: #60AAEC; padding-left: 20px;">│   ├── persona_selector.py</div>
+      <div style="color: #60AAEC; padding-left: 20px;">│   ├── topic_intake.py</div>
+      <div style="color: #60AAEC; padding-left: 20px;">│   ├── context_enrichment.py</div>
+      <div style="color: #60AAEC; padding-left: 20px;">│   └── clarification_agent.py</div>
+      <div style="color: #ccc; margin-top: 4px;">├── <span style="color: #60AAEC; font-weight: 500;">source_engine/</span></div>
+      <div style="color: #60AAEC; padding-left: 20px;">│   ├── discovery.py</div>
+      <div style="color: #60AAEC; padding-left: 20px;">│   ├── scraper.py</div>
+      <div style="color: #60AAEC; padding-left: 20px;">│   └── confidence_scorer.py</div>
+      <div style="color: #ccc; margin-top: 4px;">├── <span style="color: #FAC775; font-weight: 500;">infrastructure/</span></div>
+      <div style="color: #FAC775; padding-left: 20px;">│   ├── vector_store.py</div>
+      <div style="color: #FAC775; padding-left: 20px;">│   ├── pdf_parser.py</div>
+      <div style="color: #FAC775; padding-left: 20px;">│   ├── image_analyser.py</div>
+      <div style="color: #FAC775; padding-left: 20px;">│   ├── citation_formatter.py</div>
+      <div style="color: #FAC775; padding-left: 20px;">│   └── artifact_exporter.py</div>
+      <div style="color: #ccc; margin-top: 4px;">├── <span style="color: #FAC775; font-weight: 500;">observability/</span></div>
+      <div style="color: #FAC775; padding-left: 20px;">│   └── langfuse_client.py</div>
+      <div style="color: #ccc; margin-top: 4px;">├── <span style="color: #ccc; font-weight: 500;">crews/</span></div>
+      <div style="color: #FAC775; padding-left: 20px;">│   ├── base_crew.py <span style="color: #888; font-size: 10px;">← Squad 2</span></div>
+      <div style="color: #5DCAA5; padding-left: 20px;">│   ├── content_creator/</div>
+      <div style="color: #5DCAA5; padding-left: 36px;">│   │   ├── retrieval_agent.py</div>
+      <div style="color: #5DCAA5; padding-left: 36px;">│   │   ├── analysis_agent.py</div>
+      <div style="color: #5DCAA5; padding-left: 36px;">│   │   └── output_agent.py</div>
+      <div style="color: #AFA9EC; padding-left: 20px;">│   └── product_manager/</div>
+      <div style="color: #AFA9EC; padding-left: 36px;">│       ├── retrieval_agent.py</div>
+      <div style="color: #AFA9EC; padding-left: 36px;">│       ├── analysis_agent.py</div>
+      <div style="color: #AFA9EC; padding-left: 36px;">│       └── output_agent.py</div>
+      <div style="color: #ccc; margin-top: 4px;">└── <span style="color: #ccc;">outputs/</span></div>
+      <div style="color: #5DCAA5; padding-left: 20px;">    ├── content_creator/templates.py</div>
+      <div style="color: #AFA9EC; padding-left: 20px;">    └── product_manager/templates.py</div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 12px;">
+      <div style="background: white; border: 1.5px solid #85B7EB; border-radius: 10px; padding: 14px 18px;">
+        <div style="font-size: 11px; font-weight: 500; color: #0C447C; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px;">Squad 1 — Intake <span style="font-weight: 400; color: #378ADD;">· 2 people</span></div>
+        <div style="font-size: 12px; color: #5F5E5A; margin-bottom: 6px;">intake/ · source_engine/ · app.py</div>
+        <div style="font-size: 11px; color: #888780;">Full user journey + Streamlit UI. Mock crew responses while other squads build.</div>
+        <div style="margin-top: 8px; font-size: 11px; color: #185FA5; font-weight: 500;">Tasks 7–12</div>
+      </div>
+
+      <div style="background: white; border: 1.5px solid #FAC775; border-radius: 10px; padding: 14px 18px;">
+        <div style="font-size: 11px; font-weight: 500; color: #854F0B; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px;">Squad 2 — Infrastructure <span style="font-weight: 400; color: #BA7517;">· 2 people · starts first</span></div>
+        <div style="font-size: 12px; color: #5F5E5A; margin-bottom: 6px;">infrastructure/ · observability/ · config.py · crews/base_crew.py · Dockerfile</div>
+        <div style="font-size: 11px; color: #888780;">Ships LanceDB, parsers, LangFuse, BaseCrew. Unblocks all squads. Also owns production deployment — Docker + Streamlit Cloud.</div>
+        <div style="margin-top: 8px; font-size: 11px; color: #BA7517; font-weight: 500;">Tasks 1–6 (priority) + Task 21 (deployment)</div>
+      </div>
+
+      <div style="background: white; border: 1.5px solid #5DCAA5; border-radius: 10px; padding: 14px 18px;">
+        <div style="font-size: 11px; font-weight: 500; color: #085041; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px;">Squad 3 — Content Creator <span style="font-weight: 400; color: #1D9E75;">· 2 people</span></div>
+        <div style="font-size: 12px; color: #5F5E5A; margin-bottom: 6px;">crews/content_creator/ · outputs/content_creator/</div>
+        <div style="font-size: 11px; color: #888780;">Social + travel retrieval · trend analysis · content brief, captions, hashtags.</div>
+        <div style="margin-top: 8px; font-size: 11px; color: #0F6E56; font-weight: 500;">Tasks 13–16 · after Squad 2</div>
+      </div>
+
+      <div style="background: white; border: 1.5px solid #AFA9EC; border-radius: 10px; padding: 14px 18px;">
+        <div style="font-size: 11px; font-weight: 500; color: #26215C; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px;">Squad 4 — Product Manager <span style="font-weight: 400; color: #7F77DD;">· 2 people</span></div>
+        <div style="font-size: 12px; color: #5F5E5A; margin-bottom: 6px;">crews/product_manager/ · outputs/product_manager/</div>
+        <div style="font-size: 11px; color: #888780;">Market + industry retrieval · evidence analysis · brief, competitive summary, PRD insights.</div>
+        <div style="margin-top: 8px; font-size: 11px; color: #534AB7; font-weight: 500;">Tasks 17–19 · after Squad 2</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 9: IMPLEMENTATION PLAN -->
+<section class="slide" id="slide9">
+  <div class="slide-label">Implementation plan</div>
+  <div class="slide-title">20 tasks · ~18 hours · Sunday 2pm deadline</div>
+  <div class="slide-sub">Colour = squad. Each row is one task. Width = estimated time. Integration is the last checkpoint before recording.</div>
+
+  <div style="margin: 1.5rem 0;">
+
+    <div style="display: flex; gap: 12px; margin-bottom: 12px; font-size: 11px; flex-wrap: wrap;">
+      <span style="display:flex;align-items:center;gap:5px;"><span style="width:12px;height:12px;border-radius:2px;background:#FAC775;display:inline-block;"></span>Squad 2 — Infrastructure</span>
+      <span style="display:flex;align-items:center;gap:5px;"><span style="width:12px;height:12px;border-radius:2px;background:#60AAEC;display:inline-block;"></span>Squad 1 — Intake</span>
+      <span style="display:flex;align-items:center;gap:5px;"><span style="width:12px;height:12px;border-radius:2px;background:#5DCAA5;display:inline-block;"></span>Squad 3 — Content Creator</span>
+      <span style="display:flex;align-items:center;gap:5px;"><span style="width:12px;height:12px;border-radius:2px;background:#AFA9EC;display:inline-block;"></span>Squad 4 — Product Manager</span>
+      <span style="display:flex;align-items:center;gap:5px;"><span style="width:12px;height:12px;border-radius:2px;background:#534AB7;display:inline-block;"></span>All squads</span>
+    </div>
+
+    <div style="font-size: 11px; color: #888780; margin-bottom: 6px; display: flex; gap: 0;">
+      <div style="width: 160px; flex-shrink: 0;"></div>
+      <div style="flex: 1; display: flex; justify-content: space-between; padding: 0 4px;"><span>Fri eve</span><span>Sat morning</span><span>Sat afternoon</span><span>Sat evening</span><span>Sun morning</span><span>Sun 2pm</span></div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 5px;">
+
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <div style="width: 160px; font-size: 11px; color: #5F5E5A; flex-shrink: 0; text-align: right; padding-right: 8px;">T1 Project setup</div>
+        <div style="height: 24px; border-radius: 4px; background: #FAC775; width: 8%; display:flex;align-items:center;padding:0 6px;font-size:10px;color:#412402;">30m</div>
+      </div>
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <div style="width: 160px; font-size: 11px; color: #5F5E5A; flex-shrink: 0; text-align: right; padding-right: 8px;">T2 LangFuse client</div>
+        <div style="height: 24px; border-radius: 4px; background: #FAC775; width: 8%;"></div>
+      </div>
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <div style="width: 160px; font-size: 11px; color: #5F5E5A; flex-shrink: 0; text-align: right; padding-right: 8px;">T3 LanceDB wrapper</div>
+        <div style="height: 24px; border-radius: 4px; background: #FAC775; width: 10%;"></div>
+      </div>
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <div style="width: 160px; font-size: 11px; color: #5F5E5A; flex-shrink: 0; text-align: right; padding-right: 8px;">T4 Parsers</div>
+        <div style="height: 24px; border-radius: 4px; background: #FAC775; width: 10%;"></div>
+      </div>
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <div style="width: 160px; font-size: 11px; color: #5F5E5A; flex-shrink: 0; text-align: right; padding-right: 8px;">T5 Citation + exporter</div>
+        <div style="height: 24px; border-radius: 4px; background: #FAC775; width: 8%;"></div>
+      </div>
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <div style="width: 160px; font-size: 11px; color: #5F5E5A; flex-shrink: 0; text-align: right; padding-right: 8px;">T6 BaseCrew contract</div>
+        <div style="height: 24px; border-radius: 4px; background: #FAC775; width: 8%; display:flex;align-items:center;padding:0 6px;font-size:10px;color:#412402;white-space:nowrap;">unblocks all</div>
+      </div>
+
+      <div style="height: 8px;"></div>
+
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <div style="width: 160px; font-size: 11px; color: #5F5E5A; flex-shrink: 0; text-align: right; padding-right: 8px;">T7 Tavily discovery</div>
+        <div style="width: 52%; display:flex; justify-content:flex-end;"></div>
+        <div style="height: 24px; border-radius: 4px; background: #60AAEC; width: 8%;"></div>
+      </div>
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <div style="width: 160px; font-size: 11px; color: #5F5E5A; flex-shrink: 0; text-align: right; padding-right: 8px;">T8 Scraper</div>
+        <div style="width: 52%;"></div>
+        <div style="height: 24px; border-radius: 4px; background: #60AAEC; width: 8%;"></div>
+      </div>
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <div style="width: 160px; font-size: 11px; color: #5F5E5A; flex-shrink: 0; text-align: right; padding-right: 8px;">T9 Confidence scorer</div>
+        <div style="width: 52%;"></div>
+        <div style="height: 24px; border-radius: 4px; background: #60AAEC; width: 10%;"></div>
+      </div>
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <div style="width: 160px; font-size: 11px; color: #5F5E5A; flex-shrink: 0; text-align: right; padding-right: 8px;">T10 Clarification agent</div>
+        <div style="width: 52%;"></div>
+        <div style="height: 24px; border-radius: 4px; background: #60AAEC; width: 12%;"></div>
+      </div>
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <div style="width: 160px; font-size: 11px; color: #5F5E5A; flex-shrink: 0; text-align: right; padding-right: 8px;">T11 Context enrichment</div>
+        <div style="width: 52%;"></div>
+        <div style="height: 24px; border-radius: 4px; background: #60AAEC; width: 10%;"></div>
+      </div>
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <div style="width: 160px; font-size: 11px; color: #5F5E5A; flex-shrink: 0; text-align: right; padding-right: 8px;">T12 Streamlit app</div>
+        <div style="width: 52%;"></div>
+        <div style="height: 24px; border-radius: 4px; background: #60AAEC; width: 16%;"></div>
+      </div>
+
+      <div style="height: 8px;"></div>
+
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <div style="width: 160px; font-size: 11px; color: #5F5E5A; flex-shrink: 0; text-align: right; padding-right: 8px;">T13 CC Retrieval</div>
+        <div style="width: 52%;"></div>
+        <div style="height: 24px; border-radius: 4px; background: #5DCAA5; width: 10%;"></div>
+      </div>
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <div style="width: 160px; font-size: 11px; color: #5F5E5A; flex-shrink: 0; text-align: right; padding-right: 8px;">T14 CC Analysis</div>
+        <div style="width: 52%;"></div>
+        <div style="height: 24px; border-radius: 4px; background: #5DCAA5; width: 10%;"></div>
+      </div>
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <div style="width: 160px; font-size: 11px; color: #5F5E5A; flex-shrink: 0; text-align: right; padding-right: 8px;">T15 CC Output + templates</div>
+        <div style="width: 52%;"></div>
+        <div style="height: 24px; border-radius: 4px; background: #5DCAA5; width: 12%;"></div>
+      </div>
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <div style="width: 160px; font-size: 11px; color: #5F5E5A; flex-shrink: 0; text-align: right; padding-right: 8px;">T16 CC smoke test</div>
+        <div style="width: 52%;"></div>
+        <div style="height: 24px; border-radius: 4px; background: #5DCAA5; width: 6%;"></div>
+      </div>
+
+      <div style="height: 8px;"></div>
+
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <div style="width: 160px; font-size: 11px; color: #5F5E5A; flex-shrink: 0; text-align: right; padding-right: 8px;">T17 PM Retrieval</div>
+        <div style="width: 52%;"></div>
+        <div style="height: 24px; border-radius: 4px; background: #AFA9EC; width: 10%;"></div>
+      </div>
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <div style="width: 160px; font-size: 11px; color: #5F5E5A; flex-shrink: 0; text-align: right; padding-right: 8px;">T18 PM Analysis + Output</div>
+        <div style="width: 52%;"></div>
+        <div style="height: 24px; border-radius: 4px; background: #AFA9EC; width: 14%;"></div>
+      </div>
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <div style="width: 160px; font-size: 11px; color: #5F5E5A; flex-shrink: 0; text-align: right; padding-right: 8px;">T19 PM smoke test</div>
+        <div style="width: 52%;"></div>
+        <div style="height: 24px; border-radius: 4px; background: #AFA9EC; width: 6%;"></div>
+      </div>
+
+      <div style="height: 8px;"></div>
+
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <div style="width: 160px; font-size: 11px; font-weight: 500; color: #2C2C2A; flex-shrink: 0; text-align: right; padding-right: 8px;">T20 Integration + Loom</div>
+        <div style="width: 72%;"></div>
+        <div style="height: 28px; border-radius: 4px; background: #534AB7; width: 16%; display:flex;align-items:center;padding:0 8px;font-size:10px;color:#EEEDFE;font-weight:500;">🎬 Record by 1pm</div>
+      </div>
+
+      <div style="height: 8px;"></div>
+
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <div style="width: 160px; font-size: 11px; color: #5F5E5A; flex-shrink: 0; text-align: right; padding-right: 8px;">T21 Production deploy</div>
+        <div style="width: 52%;"></div>
+        <div style="height: 24px; border-radius: 4px; background: #FAC775; width: 14%; display:flex;align-items:center;padding:0 6px;font-size:10px;color:#412402;">Docker + Streamlit Cloud</div>
+      </div>
+
+    </div>
+  </div>
+
+  <div style="margin-top: 1rem; background: #26215C; border-radius: 8px; padding: 14px 20px; display: flex; justify-content: space-between; align-items: center;">
+    <div style="font-size: 13px; color: #AFA9EC;">Squad 2 starts tonight → unblocks everyone → parallel build Sat → integrate + deploy Sun → record with live URL by 1pm</div>
+    <div style="font-size: 14px; font-weight: 500; color: #EEEDFE;">Live URL on Loom ✓</div>
+  </div>
+</section>
+
+<!-- SLIDE 10: DESIGN DECISIONS -->
+<section class="slide" id="slide10">
+  <div class="slide-label">Design decisions</div>
+  <div class="slide-title">Every choice has a reason</div>
+  <div class="slide-sub">The decisions that shaped the architecture — and why we made them.</div>
+
+  <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 1rem;">
+
+    <div class="card" style="display: grid; grid-template-columns: 260px 1fr 1fr; gap: 16px; align-items: start;">
+      <div>
+        <div style="font-size: 11px; font-weight: 500; color: #888780; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px;">Decision</div>
+        <div style="font-size: 14px; font-weight: 500; color: #2C2C2A;">Separate crews per persona with shared infrastructure</div>
+      </div>
+      <div>
+        <div style="font-size: 11px; font-weight: 500; color: #888780; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px;">Why not the alternative</div>
+        <div style="font-size: 12px; color: #5F5E5A;">Shared crew with persona-specific output only — retrieval and analysis are fundamentally different per persona. A CC needs social sources and narrative hooks; a PM needs market data and evidence validation. Generic retrieval produces generic output.</div>
+      </div>
+      <div>
+        <div style="font-size: 11px; font-weight: 500; color: #888780; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px;">What it enables</div>
+        <div style="font-size: 12px; color: #5F5E5A;">Each crew is perfectly tuned. Teams work in parallel without conflicts. Adding a persona = 3 agents + subclass. Infrastructure maintained once.</div>
+      </div>
+    </div>
+
+    <div class="card" style="display: grid; grid-template-columns: 260px 1fr 1fr; gap: 16px; align-items: start;">
+      <div>
+        <div style="font-size: 11px; font-weight: 500; color: #888780; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px;">Decision</div>
+        <div style="font-size: 14px; font-weight: 500; color: #2C2C2A;">User selects sources + artifacts — system never decides for them</div>
+      </div>
+      <div>
+        <div style="font-size: 11px; font-weight: 500; color: #888780; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px;">Why not the alternative</div>
+        <div style="font-size: 12px; color: #5F5E5A;">Auto-selecting sources and generating all artifacts — hides confidence scoring, produces waste, and removes user trust. In research, transparency matters more than convenience.</div>
+      </div>
+      <div>
+        <div style="font-size: 11px; font-weight: 500; color: #888780; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px;">What it enables</div>
+        <div style="font-size: 12px; color: #5F5E5A;">User trusts the output because they chose the inputs. Only selected agents run — lower cost, faster results. Confidence parameters are a differentiating feature, not a detail.</div>
+      </div>
+    </div>
+
+    <div class="card" style="display: grid; grid-template-columns: 260px 1fr 1fr; gap: 16px; align-items: start;">
+      <div>
+        <div style="font-size: 11px; font-weight: 500; color: #888780; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px;">Decision</div>
+        <div style="font-size: 14px; font-weight: 500; color: #2C2C2A;">OpenAI-compatible interface with model routing by agent role</div>
+      </div>
+      <div>
+        <div style="font-size: 11px; font-weight: 500; color: #888780; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px;">Why not the alternative</div>
+        <div style="font-size: 12px; color: #5F5E5A;">Hardcoding one model — locks the system to one provider, one cost tier, one capability ceiling. Claude, GPT-4o, and open-source models all expose the same interface today.</div>
+      </div>
+      <div>
+        <div style="font-size: 11px; font-weight: 500; color: #888780; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px;">What it enables</div>
+        <div style="font-size: 12px; color: #5F5E5A;">Fast/cheap model for intake, powerful model for analysis. Model swap = config change, not code change. User can choose their own model tier.</div>
+      </div>
+    </div>
+
+    <div class="card" style="display: grid; grid-template-columns: 260px 1fr 1fr; gap: 16px; align-items: start;">
+      <div>
+        <div style="font-size: 11px; font-weight: 500; color: #888780; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px;">Decision</div>
+        <div style="font-size: 14px; font-weight: 500; color: #2C2C2A;">Tavily for discovery, BeautifulSoup only on selected URLs</div>
+      </div>
+      <div>
+        <div style="font-size: 11px; font-weight: 500; color: #888780; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px;">Why not the alternative</div>
+        <div style="font-size: 12px; color: #5F5E5A;">Scraping everything with BeautifulSoup — slow, fragile, and wasteful. Scraping only after user selection means we deep-scrape exactly the sources that matter.</div>
+      </div>
+      <div>
+        <div style="font-size: 11px; font-weight: 500; color: #888780; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px;">What it enables</div>
+        <div style="font-size: 12px; color: #5F5E5A;">Fast source discovery via Tavily API. Deep content only from chosen sources. Respects user's source selection decision. Lower API cost overall.</div>
+      </div>
+    </div>
+
+    <div class="card" style="display: grid; grid-template-columns: 260px 1fr 1fr; gap: 16px; align-items: start;">
+      <div>
+        <div style="font-size: 11px; font-weight: 500; color: #888780; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px;">Decision</div>
+        <div style="font-size: 14px; font-weight: 500; color: #2C2C2A;">LangFuse over LangSmith for observability</div>
+      </div>
+      <div>
+        <div style="font-size: 11px; font-weight: 500; color: #888780; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px;">Why not the alternative</div>
+        <div style="font-size: 12px; color: #5F5E5A;">LangSmith is proprietary and usage-capped on free tier. For a production system we intend to keep running, open-source observability with a self-host path is the right long-term call.</div>
+      </div>
+      <div>
+        <div style="font-size: 11px; font-weight: 500; color: #888780; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px;">What it enables</div>
+        <div style="font-size: 12px; color: #5F5E5A;">Cloud free tier now, self-hosted on BharatDesha infra later — one config change, no code changes. Full agent trace visibility in the Loom demo.</div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- SLIDE 11: EXTENSIBILITY ROADMAP -->
+<section class="slide" id="slide11">
+  <div class="slide-label">Extensibility roadmap</div>
+  <div class="slide-title">Built to grow — three phases, one architecture</div>
+  <div class="slide-sub">The hackathon is Phase 1. The architecture already supports Phases 2 and 3 without rework.</div>
+
+  <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin: 1.5rem 0;">
+
+    <div style="border-radius: 12px; border: 1.5px solid #5DCAA5; overflow: hidden;">
+      <div style="background: #0F6E56; padding: 14px 18px;">
+        <div style="font-size: 11px; color: #9FE1CB; font-weight: 500; margin-bottom: 4px;">Phase 1 — Now</div>
+        <div style="font-size: 18px; font-weight: 500; color: white;">Hackathon MVP</div>
+        <div style="font-size: 12px; color: #9FE1CB; margin-top: 4px;">Streamlit · LanceDB local · 2 personas</div>
+      </div>
+      <div style="background: white; padding: 14px 18px;">
+        <ul style="font-size: 12px; color: #5F5E5A; line-height: 2; padding-left: 14px;">
+          <li>Content Creator crew</li>
+          <li>Product Manager crew</li>
+          <li>Multimodal intake</li>
+          <li>Confidence scoring</li>
+          <li>Artifact selection</li>
+          <li>LangFuse cloud tracing</li>
+          <li>Docker + Streamlit Cloud</li>
+        </ul>
+        <div style="margin-top: 10px; padding-top: 10px; border-top: 0.5px solid #D3D1C7; font-size: 11px; color: #0F6E56; font-weight: 500;">Effort: 18 hours · 4 squads</div>
+      </div>
+    </div>
+
+    <div style="border-radius: 12px; border: 1.5px solid #85B7EB; overflow: hidden;">
+      <div style="background: #185FA5; padding: 14px 18px;">
+        <div style="font-size: 11px; color: #B5D4F4; font-weight: 500; margin-bottom: 4px;">Phase 2 — Post-hackathon</div>
+        <div style="font-size: 18px; font-weight: 500; color: white;">Production API</div>
+        <div style="font-size: 12px; color: #B5D4F4; margin-top: 4px;">FastAPI · Cloud Run · async tasks</div>
+      </div>
+      <div style="background: white; padding: 14px 18px;">
+        <ul style="font-size: 12px; color: #5F5E5A; line-height: 2; padding-left: 14px;">
+          <li>FastAPI replaces Streamlit backend</li>
+          <li>Celery + Redis task queue</li>
+          <li>Streaming agent responses</li>
+          <li>Multi-user sessions</li>
+          <li>GCP Cloud Run deployment</li>
+          <li>LangFuse self-hosted</li>
+          <li>API rate limiting + auth</li>
+        </ul>
+        <div style="margin-top: 10px; padding-top: 10px; border-top: 0.5px solid #D3D1C7;">
+          <div style="font-size: 11px; color: #185FA5; font-weight: 500;">Effort: ~1 afternoon</div>
+          <div style="font-size: 11px; color: #888780; margin-top: 2px;">80% of codebase unchanged — only API layer added</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="border-radius: 12px; border: 1.5px solid #AFA9EC; overflow: hidden;">
+      <div style="background: #3C3489; padding: 14px 18px;">
+        <div style="font-size: 11px; color: #CECBF6; font-weight: 500; margin-bottom: 4px;">Phase 3 — BharatDesha</div>
+        <div style="font-size: 18px; font-weight: 500; color: white;">Platform</div>
+        <div style="font-size: 12px; color: #CECBF6; margin-top: 4px;">New personas · Next.js · full product</div>
+      </div>
+      <div style="background: white; padding: 14px 18px;">
+        <ul style="font-size: 12px; color: #5F5E5A; line-height: 2; padding-left: 14px;">
+          <li>BharatDesha persona crew</li>
+          <li>Travel Writer persona crew</li>
+          <li>Next.js frontend</li>
+          <li>User accounts + history</li>
+          <li>Saved research libraries</li>
+          <li>Team collaboration</li>
+          <li>Custom source whitelists per org</li>
+        </ul>
+        <div style="margin-top: 10px; padding-top: 10px; border-top: 0.5px solid #D3D1C7;">
+          <div style="font-size: 11px; color: #534AB7; font-weight: 500;">Each new persona: ~3 hours</div>
+          <div style="font-size: 11px; color: #888780; margin-top: 2px;">BaseCrew contract makes every addition mechanical</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 8px;">
+    <div style="background: #F1EFE8; border-radius: 8px; padding: 14px 18px;">
+      <div style="font-size: 12px; font-weight: 500; color: #2C2C2A; margin-bottom: 6px;">The architectural guarantee</div>
+      <div style="font-size: 12px; color: #5F5E5A; line-height: 1.7;">Every design decision in Phase 1 was made with Phases 2 and 3 in mind. The <span style="font-family: monospace; font-size: 11px; background: #D3D1C7; padding: 1px 4px; border-radius: 3px;">BaseCrew</span> contract, the OpenAI-compatible interface, the env separation, the shared infrastructure layer — none of these are over-engineering. They are the minimum viable architecture for a system designed to grow.</div>
+    </div>
+    <div style="background: #26215C; border-radius: 8px; padding: 14px 18px;">
+      <div style="font-size: 12px; font-weight: 500; color: #EEEDFE; margin-bottom: 6px;">What this means for Outskill evaluation</div>
+      <div style="font-size: 12px; color: #AFA9EC; line-height: 1.7;">This is not a hackathon prototype that gets thrown away on Monday. The architecture is production-ready, the deployment is live, and the roadmap is specced. We built a platform in 18 hours — and we can prove it.</div>
+    </div>
+  </div>
+</section>
+
+</body>
+</html>
