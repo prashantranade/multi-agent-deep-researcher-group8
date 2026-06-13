@@ -222,3 +222,53 @@ def test_social_agent_generates_multiple_platforms():
     assert len(results) == 4
     types = [r["type"] for r in results]
     assert set(types) == {"instagram", "facebook", "x_post", "youtube"}
+
+
+def test_bharat_desha_crew_run_returns_crew_output():
+    from crews.bharat_desha.crew import BharatDeshaCrew
+    from crews.base_crew import ResearchBrief, CrewOutput
+
+    brief = ResearchBrief(
+        topic="Varanasi spiritual tour",
+        persona="bharat_desha",
+        audience="solo spiritual travellers",
+        tone="warm",
+        depth="standard",
+        selected_artifacts=["blog_post", "instagram"],
+    )
+
+    mock_trend = {
+        "trends": ["Varanasi trending"],
+        "seasonality": {"best_months": ["October"], "avoid_months": [], "active_festivals": [], "advisories": []},
+        "topic_suggestions": ["Varanasi ghats guide"]
+    }
+    mock_seo = {
+        "keywords": [{"keyword": "Varanasi spiritual tour", "intent": "informational"}],
+        "primary_keyword": "Varanasi spiritual tour"
+    }
+    mock_retrieved = [{"text": "Varanasi is sacred...", "metadata": {"source": "https://example.com"}}]
+    mock_analysis = {
+        "spiritual": "Sacred city...", "practical": "Fly to VNS...",
+        "cultural": "Ganga aarti...", "wellness": "Ashrams nearby...",
+        "seasonal": "Oct-March best...",
+        "key_points": ["Visit at dawn"],
+        "citations": ["https://example.com"]
+    }
+    mock_blog = {"type": "blog_post", "content": "# Varanasi Guide\n\n...", "citations": []}
+    mock_social = [{"type": "instagram", "content": "Caption here..."}]
+
+    with patch("crews.bharat_desha.crew.run_trend_agent", return_value=mock_trend), \
+         patch("crews.bharat_desha.crew.run_seo_agent", return_value=mock_seo), \
+         patch("crews.bharat_desha.crew.run_retrieval_agent", return_value=mock_retrieved), \
+         patch("crews.bharat_desha.crew.run_analysis_agent", return_value=mock_analysis), \
+         patch("crews.bharat_desha.crew.run_content_agent", return_value=mock_blog), \
+         patch("crews.bharat_desha.crew.run_social_agent", return_value=mock_social):
+
+        crew = BharatDeshaCrew()
+        output = crew.run(brief)
+
+    assert isinstance(output, CrewOutput)
+    artifact_types = [a["type"] for a in output.artifacts]
+    assert "blog_post" in artifact_types
+    assert "instagram" in artifact_types
+    assert "seo_keywords" in artifact_types   # always included
