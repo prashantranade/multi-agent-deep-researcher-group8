@@ -113,3 +113,31 @@ def test_retrieval_agent_returns_chunks():
     assert len(result) > 0
     assert "text" in result[0]
     assert "metadata" in result[0]
+
+
+def test_analysis_agent_returns_bharat_desha_lens():
+    from crews.bharat_desha.analysis_agent import run_analysis_agent
+
+    retrieved = [
+        {"text": "Varanasi is considered the holiest city in Hinduism...", "metadata": {"source": "https://example.com"}},
+        {"text": "Best time to visit is October to March for ghats walk...", "metadata": {"source": "https://example.com"}},
+    ]
+    seo_context = {"keywords": [{"keyword": "Varanasi spiritual tour", "intent": "informational"}], "primary_keyword": "Varanasi spiritual tour"}
+    trend_context = {"seasonality": {"best_months": ["October", "March"], "active_festivals": ["Diwali"]}, "trends": []}
+
+    mock_response = """{
+        "spiritual": "Varanasi is the abode of Lord Shiva, one of the 12 Jyotirlingas...",
+        "practical": "Fly to Varanasi airport (VNS), auto-rickshaw to ghats costs 150 INR...",
+        "cultural": "Ganga aarti at Dashashwamedh Ghat runs every evening at 7pm...",
+        "wellness": "Several ashrams offer 5-day yoga and meditation retreats near Assi Ghat...",
+        "seasonal": "October to March is ideal; avoid June-August monsoon...",
+        "key_points": ["Visit Kashi Vishwanath temple at dawn", "Sunrise boat ride on the Ganga"],
+        "citations": ["https://example.com"]
+    }"""
+
+    with patch("crews.bharat_desha.analysis_agent.chat_with_fallback", return_value=mock_response):
+        result = run_analysis_agent(retrieved, seo_context, trend_context)
+
+    for key in ["spiritual", "practical", "cultural", "wellness", "seasonal", "key_points", "citations"]:
+        assert key in result
+    assert isinstance(result["key_points"], list)
