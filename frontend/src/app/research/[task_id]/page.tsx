@@ -457,9 +457,14 @@ export default function LiveTracker() {
       {/* Complete Artifacts Display in White Paper format */}
       {statusData?.status === 'complete' && artifacts.length > 0 && (
         <div className="space-y-12">
-          <h2 className="text-2xl font-bold text-slate-800 flex items-center gap-2">
-            <FileText className="w-6 h-6 text-indigo-600" /> Constructed Research Artifacts ({artifacts.length})
-          </h2>
+          <div className="space-y-1.5">
+            <h2 className="text-2xl font-bold text-slate-800 flex items-center gap-2">
+              <FileText className="w-6 h-6 text-indigo-600" /> Constructed Research Artifacts ({artifacts.length})
+            </h2>
+            <p className="text-slate-500 text-sm pl-8">
+              Research Topic: <span className="font-semibold text-slate-700">{topic}</span>
+            </p>
+          </div>
 
           <div className="space-y-12">
             {artifacts.map((art, idx) => (
