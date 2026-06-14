@@ -21,6 +21,7 @@ export default function LiveTracker() {
   const [artifacts, setArtifacts] = useState<Artifact[]>([]);
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
   const [pollingErrorCount, setPollingErrorCount] = useState(0);
+  const [error, setError] = useState<string | null>(null);
 
   const logEndRef = useRef<HTMLDivElement>(null);
 
@@ -30,6 +31,7 @@ export default function LiveTracker() {
       const data = await getResearchStatus(task_id);
       setStatusData(data);
       setPollingErrorCount(0);
+      setError(null);
 
       if (data.status === 'complete') {
         fetchResults();
@@ -38,9 +40,14 @@ export default function LiveTracker() {
       if (data.status === 'failed') {
         return true; // Stop polling
       }
-    } catch (err) {
+    } catch (err: any) {
+      if (err.message === 'Task not found') {
+        setError('Task not found. The backend server might have restarted, clearing the task from in-memory storage.');
+        return true; // Stop polling
+      }
       setPollingErrorCount(c => c + 1);
       if (pollingErrorCount > 10) {
+        setError('Failed to connect to the backend server. Please verify it is running.');
         return true; // Stop polling after 10 failures
       }
     }
@@ -148,6 +155,20 @@ export default function LiveTracker() {
           <span className="font-mono text-xs text-slate-800 font-bold bg-white border border-slate-200 px-3 py-1 rounded-md">{task_id}</span>
         </div>
       </div>
+
+      {error && (
+        <div className="p-8 rounded-3xl bg-slate-50 border border-slate-200 text-center flex flex-col items-center max-w-md mx-auto">
+          <XCircle className="w-12 h-12 text-slate-400 mb-4" />
+          <h3 className="text-xl font-bold text-slate-800 mb-2">Research Task Error</h3>
+          <p className="text-sm text-slate-500 mb-6">{error}</p>
+          <button
+            onClick={() => router.push('/research')}
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-medium text-sm transition-colors cursor-pointer shadow-sm hover:shadow"
+          >
+            Start New Research
+          </button>
+        </div>
+      )}
 
       {/* Polling / Status Display */}
       {statusData && statusData.status !== 'complete' && statusData.status !== 'failed' && (

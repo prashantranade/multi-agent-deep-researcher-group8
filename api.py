@@ -7,6 +7,8 @@ import uuid
 import io
 import pypdf
 import docx
+import os
+import json
 
 from crews.base_crew import ResearchBrief
 from crews.router import get_crew
@@ -23,8 +25,27 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# In-memory storage for background task states
-tasks: Dict[str, Dict[str, Any]] = {}
+TASKS_FILE = "tasks_db.json"
+
+def load_tasks() -> Dict[str, Any]:
+    if os.path.exists(TASKS_FILE):
+        try:
+            with open(TASKS_FILE, "r", encoding="utf-8") as f:
+                return json.load(f)
+        except Exception as e:
+            print(f"Error loading tasks: {e}")
+            return {}
+    return {}
+
+def save_tasks(tasks_dict: Dict[str, Any]):
+    try:
+        with open(TASKS_FILE, "w", encoding="utf-8") as f:
+            json.dump(tasks_dict, f, ensure_ascii=False, indent=2)
+    except Exception as e:
+        print(f"Error saving tasks: {e}")
+
+# Load persisted tasks on startup
+tasks: Dict[str, Dict[str, Any]] = load_tasks()
 
 class DiscoverRequest(BaseModel):
     topic: str
@@ -55,6 +76,7 @@ def run_crew_task(task_id: str, brief: ResearchBrief):
             "notes": getattr(output, "notes", []),
             "error": None
         }
+        save_tasks(tasks)
     except Exception as e:
         tasks[task_id] = {
             "status": "failed",
@@ -62,6 +84,7 @@ def run_crew_task(task_id: str, brief: ResearchBrief):
             "notes": [],
             "error": str(e)
         }
+        save_tasks(tasks)
 
 @app.post("/api/research/start")
 def api_start_research(payload: StartRequest, background_tasks: BackgroundTasks):
@@ -83,6 +106,7 @@ def api_start_research(payload: StartRequest, background_tasks: BackgroundTasks)
         "notes": [],
         "error": None
     }
+    save_tasks(tasks)
     
     background_tasks.add_task(run_crew_task, task_id, brief)
     return {"task_id": task_id, "status": "running"}

@@ -24,12 +24,14 @@ export async function startResearch(brief: ResearchBrief): Promise<{ task_id: st
 
 export async function getResearchStatus(taskId: string): Promise<TaskStatusResponse> {
   const res = await fetch(`${API_BASE}/research/status/${taskId}`);
+  if (res.status === 404) throw new Error('Task not found');
   if (!res.ok) throw new Error('Failed to retrieve task status');
   return res.json();
 }
 
 export async function getResearchResults(taskId: string): Promise<TaskResultsResponse> {
   const res = await fetch(`${API_BASE}/research/results/${taskId}`);
+  if (res.status === 404) throw new Error('Task not found');
   if (!res.ok) throw new Error('Failed to retrieve task results');
   return res.json();
 }
