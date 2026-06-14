@@ -1,9 +1,12 @@
 # api.py
-from fastapi import FastAPI, BackgroundTasks, HTTPException
+from fastapi import FastAPI, BackgroundTasks, HTTPException, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import List, Dict, Any, Optional
 import uuid
+import io
+import pypdf
+import docx
 
 from crews.base_crew import ResearchBrief
 from crews.router import get_crew
@@ -106,3 +109,28 @@ def api_get_results(task_id: str):
         "task_id": task_id,
         "artifacts": task["artifacts"]
     }
+
+@app.post("/api/context/upload")
+async def api_upload_context(file: UploadFile = File(...)):
+    filename = file.filename or ""
+    content = await file.read()
+    text = ""
+    
+    try:
+        if filename.endswith(".pdf"):
+            reader = pypdf.PdfReader(io.BytesIO(content))
+            pages_text = []
+            for page in reader.pages:
+                t = page.extract_text()
+                if t:
+                    pages_text.append(t)
+            text = "\n".join(pages_text)
+        elif filename.endswith(".docx"):
+            doc = docx.Document(io.BytesIO(content))
+            text = "\n".join([p.text for p in doc.paragraphs])
+        else:
+            text = content.decode("utf-8", errors="ignore")
+            
+        return {"text": text, "status": "success"}
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Failed to parse document: {str(e)}")
