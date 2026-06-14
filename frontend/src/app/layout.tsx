@@ -15,28 +15,28 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="antialiased overflow-x-hidden relative">
-        {/* Ambient Glowing Background Elements */}
-        <div className="absolute top-[-10%] left-[-10%] w-[50vw] h-[50vw] rounded-full bg-indigo-500/10 blur-[120px] pointer-events-none" />
-        <div className="absolute bottom-[-10%] right-[-10%] w-[50vw] h-[50vw] rounded-full bg-purple-500/10 blur-[120px] pointer-events-none" />
+      <body className="antialiased overflow-x-hidden relative bg-slate-50/50">
+        {/* Soft Ambient Light Background Glows */}
+        <div className="absolute top-[-10%] left-[-10%] w-[50vw] h-[50vw] rounded-full bg-slate-100/50 blur-[120px] pointer-events-none" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[50vw] h-[50vw] rounded-full bg-indigo-50/30 blur-[120px] pointer-events-none" />
 
-        {/* Navigation Bar */}
-        <header className="sticky top-0 z-50 glass-panel border-b border-slate-800/80 px-6 py-4 flex items-center justify-between">
+        {/* Clean Minimalist Navigation Bar */}
+        <header className="sticky top-0 z-50 clean-panel border-b border-slate-200/80 px-6 py-4 flex items-center justify-between bg-white/85">
           <Link href="/" className="flex items-center gap-2 group">
-            <div className="p-2 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 shadow-md shadow-indigo-500/20 group-hover:scale-105 transition-transform duration-200">
-              <Zap className="w-5 h-5 text-white" />
+            <div className="p-2 rounded-xl bg-slate-900 text-white shadow-sm group-hover:scale-105 transition-transform duration-200">
+              <Zap className="w-5 h-5" />
             </div>
-            <span className="font-bold text-lg bg-gradient-to-r from-slate-100 via-slate-200 to-indigo-300 bg-clip-text text-transparent">
+            <span className="font-bold text-lg text-slate-800 tracking-tight">
               DEEP RESEARCHER
             </span>
           </Link>
 
           <nav className="flex gap-6">
-            <Link href="/research" className="flex items-center gap-1.5 text-sm font-medium text-slate-300 hover:text-indigo-400 transition-colors">
+            <Link href="/research" className="flex items-center gap-1.5 text-sm font-semibold text-slate-600 hover:text-indigo-600 transition-colors">
               <Compass className="w-4 h-4" />
               Research Panel
             </Link>
-            <Link href="/history" className="flex items-center gap-1.5 text-sm font-medium text-slate-300 hover:text-indigo-400 transition-colors">
+            <Link href="/history" className="flex items-center gap-1.5 text-sm font-semibold text-slate-600 hover:text-indigo-600 transition-colors">
               <History className="w-4 h-4" />
               Research Logs
             </Link>
