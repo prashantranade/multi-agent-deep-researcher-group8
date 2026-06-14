@@ -6,6 +6,7 @@ import { getResearchStatus, getResearchResults } from '@/lib/api';
 import { Artifact, TaskStatusResponse } from '@/lib/types';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import rehypeRaw from 'rehype-raw';
 import { Loader2, CheckCircle2, XCircle, Terminal, ClipboardCheck, Clipboard, Download, ArrowLeft, FileText, Calendar, User, AlignLeft } from 'lucide-react';
 
 // Node graphs configurations
@@ -106,6 +107,161 @@ export default function LiveTracker() {
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
+  };
+
+  const handlePrint = (art: Artifact, index: number) => {
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) return;
+
+    const contentHtml = document.getElementById(`art-content-${index}`)?.innerHTML || '';
+
+    printWindow.document.write(`
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>${art.type.replace('_', ' ').toUpperCase()} - Deep Researcher</title>
+          <style>
+            body {
+              font-family: Georgia, Cambria, "Times New Roman", Times, serif;
+              color: #334155;
+              line-height: 1.8;
+              font-size: 1.05rem;
+              padding: 2.5rem;
+              max-width: 800px;
+              margin: 0 auto;
+              background: #ffffff;
+            }
+            .meta-header {
+              border-bottom: 2px solid #e2e8f0;
+              padding-bottom: 1.5rem;
+              margin-bottom: 2rem;
+              font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            }
+            .meta-title {
+              font-size: 1.75rem;
+              font-weight: 800;
+              color: #0f172a;
+              margin-bottom: 0.75rem;
+              text-transform: capitalize;
+            }
+            .meta-grid {
+              display: grid;
+              grid-template-columns: 1fr 1fr;
+              gap: 0.5rem;
+              font-size: 0.85rem;
+              color: #64748b;
+            }
+            h1, h2, h3, h4 {
+              font-family: ui-sans-serif, system-ui, -apple-system, sans-serif;
+              color: #0f172a;
+              font-weight: 700;
+              margin-top: 1.8em;
+              margin-bottom: 0.6em;
+            }
+            h1 {
+              font-size: 1.8rem;
+              border-bottom: 1px solid #e2e8f0;
+              padding-bottom: 0.3em;
+            }
+            h2 { font-size: 1.4rem; }
+            h3 { font-size: 1.15rem; }
+            p { margin-bottom: 1.25em; }
+            ul, ol { margin-bottom: 1.25em; padding-left: 1.5em; }
+            li { margin-bottom: 0.4em; }
+            code {
+              font-family: monospace;
+              background: #f1f5f9;
+              padding: 0.2em 0.4em;
+              border-radius: 0.25rem;
+              font-size: 0.9em;
+              color: #0f172a;
+            }
+            pre {
+              background: #0f172a;
+              color: #f8fafc;
+              padding: 1rem;
+              border-radius: 0.5rem;
+              overflow-x: auto;
+              margin-bottom: 1.25em;
+            }
+            pre code { background: transparent; color: inherit; padding: 0; }
+            blockquote {
+              border-left: 4px solid #cbd5e1;
+              padding-left: 1rem;
+              color: #475569;
+              font-style: italic;
+              margin-bottom: 1.25em;
+            }
+            a { color: #2563eb; text-decoration: underline; }
+            table {
+              width: 100%;
+              border-collapse: separate;
+              border-spacing: 0;
+              margin: 1.75em 0;
+              font-family: ui-sans-serif, system-ui, -apple-system, sans-serif;
+              font-size: 0.875rem;
+              line-height: 1.5;
+              border: 1px solid #e2e8f0;
+              border-radius: 12px;
+              overflow: hidden;
+            }
+            th {
+              background: #f8fafc;
+              color: #0f172a;
+              font-weight: 700;
+              padding: 0.85rem 1.15rem;
+              text-align: left;
+              border-bottom: 2px solid #e2e8f0;
+              border-right: 1px solid #e2e8f0;
+            }
+            th:last-child { border-right: none; }
+            td {
+              padding: 0.85rem 1.15rem;
+              color: #475569;
+              border-bottom: 1px solid #f1f5f9;
+              border-right: 1px solid #e2e8f0;
+            }
+            td:last-child { border-right: none; }
+            tr:last-child td { border-bottom: none; }
+            tr:nth-child(even) td { background: rgba(248, 250, 252, 0.6); }
+            @page {
+              size: auto;
+              margin: 0;
+            }
+            @media print {
+              body {
+                padding: 20mm 15mm;
+                max-width: none;
+                margin: 0;
+              }
+              tr {
+                page-break-inside: avoid;
+              }
+            }
+          </style>
+        </head>
+        <body>
+          <div class="meta-header">
+            <div class="meta-title">${art.type.replace('_', ' ')}</div>
+            <div class="meta-grid">
+              <div><strong>Research Topic:</strong> ${topic}</div>
+              <div><strong>Generated On:</strong> ${new Date().toLocaleDateString()}</div>
+              <div><strong>Persona Crew:</strong> ${persona.replace('_', ' ')}</div>
+            </div>
+          </div>
+          <div>
+            ${contentHtml}
+          </div>
+        </body>
+      </html>
+    `);
+
+    printWindow.document.close();
+    printWindow.focus();
+    setTimeout(() => {
+      printWindow.print();
+      printWindow.close();
+    }, 250);
   };
 
   // Determine executing persona to fetch pipeline nodes
@@ -327,10 +483,18 @@ export default function LiveTracker() {
                       </button>
                       <button
                         onClick={() => handleDownload(art)}
-                        className="p-2 rounded-lg border border-slate-200 hover:border-slate-300 text-slate-500 hover:text-slate-800 hover:bg-white transition-all cursor-pointer"
+                        className="p-2 rounded-lg border border-slate-200 hover:border-slate-350 hover:bg-slate-50 text-slate-500 hover:text-slate-800 hover:bg-white transition-all cursor-pointer"
                         title="Download Markdown file"
                       >
                         <Download className="w-4 h-4" />
+                      </button>
+                      <button
+                        onClick={() => handlePrint(art, idx)}
+                        className="p-2 px-3 rounded-lg border border-slate-200 hover:border-slate-350 hover:bg-slate-50 text-slate-500 hover:text-slate-800 hover:bg-white transition-all cursor-pointer flex items-center gap-1.5 text-xs font-semibold"
+                        title="Download as PDF"
+                      >
+                        <FileText className="w-4 h-4 text-indigo-655" />
+                        <span>PDF</span>
                       </button>
                     </div>
                   </div>
@@ -362,8 +526,8 @@ export default function LiveTracker() {
                 </div>
 
                 {/* Formatted Markdown document body */}
-                <div className="p-10 md:p-14 pt-8 doc-prose">
-                  <ReactMarkdown remarkPlugins={[remarkGfm]}>{art.content}</ReactMarkdown>
+                <div id={`art-content-${idx}`} className="p-10 md:p-14 pt-8 doc-prose">
+                  <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>{art.content}</ReactMarkdown>
                 </div>
 
                 {/* Citations section if any exist */}
