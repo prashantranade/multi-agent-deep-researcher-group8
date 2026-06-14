@@ -33,3 +33,15 @@ export async function getResearchResults(taskId: string): Promise<TaskResultsRes
   if (!res.ok) throw new Error('Failed to retrieve task results');
   return res.json();
 }
+
+export async function uploadDocument(file: File): Promise<{ text: string }> {
+  const formData = new FormData();
+  formData.append('file', file);
+  const res = await fetch(`${API_BASE}/context/upload`, {
+    method: 'POST',
+    body: formData,
+  });
+  if (!res.ok) throw new Error('Failed to upload and parse document');
+  return res.json();
+}
+
