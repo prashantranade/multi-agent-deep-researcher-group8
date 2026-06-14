@@ -5,7 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { getResearchStatus, getResearchResults } from '@/lib/api';
 import { Artifact, TaskStatusResponse } from '@/lib/types';
 import ReactMarkdown from 'react-markdown';
-import { Loader2, CheckCircle2, XCircle, Terminal, ClipboardCheck, Clipboard, Download, ArrowLeft, RefreshCw, FileText } from 'lucide-react';
+import { Loader2, CheckCircle2, XCircle, Terminal, ClipboardCheck, Clipboard, Download, ArrowLeft, FileText, Calendar, User, AlignLeft } from 'lucide-react';
 
 // Node graphs configurations
 const PERSONA_PIPELINES = {
@@ -104,6 +104,8 @@ export default function LiveTracker() {
   const savedHistory = typeof window !== 'undefined' ? JSON.parse(localStorage.getItem('research_history') || '[]') : [];
   const runInfo = savedHistory.find((item: any) => item.id === task_id);
   const persona = runInfo?.persona || 'product_manager';
+  const topic = runInfo?.topic || 'General Agentic Research Topic';
+  // @ts-ignore
   const pipelineNodes = PERSONA_PIPELINES[persona as keyof typeof PERSONA_PIPELINES] || PERSONA_PIPELINES.product_manager;
 
   // Estimate active node based on status & log size
@@ -131,39 +133,39 @@ export default function LiveTracker() {
   const activeNode = getActiveNode();
 
   return (
-    <div className="space-y-10 max-w-5xl mx-auto">
+    <div className="space-y-10 max-w-4xl mx-auto">
       {/* Navigation / Header */}
-      <div className="flex items-center justify-between border-b border-slate-800/80 pb-6">
+      <div className="flex items-center justify-between border-b border-slate-200 pb-6">
         <button
           onClick={() => router.push('/research')}
-          className="inline-flex items-center gap-2 text-sm font-semibold text-slate-400 hover:text-slate-200 transition-colors cursor-pointer"
+          className="inline-flex items-center gap-2 text-sm font-semibold text-slate-500 hover:text-slate-800 transition-colors cursor-pointer"
         >
           <ArrowLeft className="w-4 h-4" /> Back to Research
         </button>
         
         <div className="text-right">
-          <span className="text-xs text-slate-500 uppercase tracking-widest block mb-1">TASK ID</span>
-          <span className="font-mono text-sm text-slate-300 font-bold bg-slate-900 border border-slate-800/80 px-3 py-1 rounded-md">{task_id}</span>
+          <span className="text-xs text-slate-400 uppercase tracking-widest block mb-1">TASK ID</span>
+          <span className="font-mono text-xs text-slate-800 font-bold bg-white border border-slate-200 px-3 py-1 rounded-md">{task_id}</span>
         </div>
       </div>
 
       {/* Polling / Status Display */}
       {statusData && statusData.status !== 'complete' && statusData.status !== 'failed' && (
-        <div className="glass-panel rounded-3xl p-8 text-center flex flex-col items-center">
-          <Loader2 className="w-10 h-10 text-indigo-500 animate-spin mb-4" />
-          <h3 className="text-xl font-bold text-slate-200 mb-2">Agents Hard at Work...</h3>
-          <p className="text-sm text-slate-400 max-w-md">The Deep Researcher crew is executing state graph transitions in background threads. Watch progress below.</p>
+        <div className="clean-card rounded-3xl p-8 text-center flex flex-col items-center">
+          <Loader2 className="w-10 h-10 text-indigo-600 animate-spin mb-4" />
+          <h3 className="text-xl font-bold text-slate-800 mb-2">Agents Executing Workflow...</h3>
+          <p className="text-sm text-slate-500 max-w-md">Your strategic deep researcher crew is processing search queries and synthesizing knowledge.</p>
         </div>
       )}
 
       {statusData && statusData.status === 'failed' && (
-        <div className="p-8 rounded-3xl bg-red-950/20 border border-red-900/50 text-center flex flex-col items-center">
+        <div className="p-8 rounded-3xl bg-red-50 border border-red-200 text-center flex flex-col items-center">
           <XCircle className="w-12 h-12 text-red-500 mb-4" />
-          <h3 className="text-xl font-bold text-red-200 mb-2">Research Operation Failed</h3>
-          <p className="text-sm text-red-400 max-w-md mb-4">{statusData.error || 'Unknown workflow error encountered.'}</p>
+          <h3 className="text-xl font-bold text-red-800 mb-2">Research Operation Failed</h3>
+          <p className="text-sm text-red-600 max-w-md mb-4">{statusData.error || 'Unknown workflow error encountered.'}</p>
           <button
             onClick={() => router.push('/research')}
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-red-900/50 hover:bg-red-900/80 text-white font-medium text-sm transition-colors cursor-pointer"
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-red-650 hover:bg-red-750 text-white font-medium text-sm transition-colors cursor-pointer"
           >
             Start New Research
           </button>
@@ -172,8 +174,8 @@ export default function LiveTracker() {
 
       {/* Horizontal Node graph pipeline tracker */}
       {statusData && statusData.status !== 'failed' && (
-        <div className="glass-panel rounded-3xl p-6">
-          <span className="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-6">Workflow Graph Pipeline</span>
+        <div className="clean-card rounded-3xl p-6">
+          <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-6">Workflow Graph Pipeline</span>
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 md:gap-2">
             {pipelineNodes.map((node: string, index: number) => {
               const isActive = activeNode === node;
@@ -183,23 +185,23 @@ export default function LiveTracker() {
               return (
                 <div key={node} className="flex flex-1 items-center gap-4 md:gap-2">
                   <div className="flex items-center gap-3">
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center border transition-all duration-300 ${
-                      isActive ? 'bg-indigo-500 border-indigo-400 text-white animate-pulse live-glow' :
-                      isPast ? 'bg-emerald-500/20 border-emerald-500 text-emerald-400' :
-                      'bg-slate-900 border-slate-800 text-slate-600'
+                    <div className={`w-8 h-8 rounded-full flex items-center justify-center border text-xs font-bold transition-all duration-300 ${
+                      isActive ? 'bg-indigo-600 border-indigo-600 text-white animate-pulse shadow-md shadow-indigo-100' :
+                      isPast ? 'bg-emerald-50 border-emerald-500 text-emerald-700' :
+                      'bg-slate-50 border-slate-200 text-slate-400'
                     }`}>
-                      {isPast ? <CheckCircle2 className="w-5 h-5" /> : index + 1}
+                      {isPast ? <CheckCircle2 className="w-5 h-5 text-emerald-600" /> : index + 1}
                     </div>
                     <span className={`text-sm font-semibold capitalize ${
-                      isActive ? 'text-indigo-400 font-bold' :
-                      isPast ? 'text-slate-300' :
-                      'text-slate-500'
+                      isActive ? 'text-indigo-600 font-bold' :
+                      isPast ? 'text-slate-800' :
+                      'text-slate-400'
                     }`}>
                       {node.replace('_', ' ')}
                     </span>
                   </div>
                   {index < pipelineNodes.length - 1 && (
-                    <div className="hidden md:block flex-1 h-px bg-slate-800 mx-2" />
+                    <div className="hidden md:block flex-1 h-px bg-slate-200 mx-2" />
                   )}
                 </div>
               );
@@ -208,90 +210,152 @@ export default function LiveTracker() {
         </div>
       )}
 
-      {/* Scrollable monospace live console logs */}
-      {statusData && statusData.status !== 'failed' && (
-        <div className="glass-panel rounded-3xl overflow-hidden border border-slate-800/80">
-          <div className="px-5 py-3.5 bg-slate-900/80 border-b border-slate-800/80 flex items-center gap-2">
-            <Terminal className="w-4 h-4 text-purple-400" />
-            <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Live Agent Exec Logs</span>
-          </div>
-          <div className="p-6 bg-slate-955 font-mono text-xs text-purple-400 space-y-3 h-[250px] overflow-y-auto">
-            {statusData.notes && statusData.notes.map((note: string, i: number) => (
-              <div key={i} className="leading-relaxed flex gap-2">
-                <span className="text-slate-700 select-none">[{new Date().toLocaleTimeString()}]</span>
-                <span className="text-purple-300">{note}</span>
-              </div>
-            ))}
-            {statusData.status === 'running' && (
-              <div className="flex items-center gap-2 text-indigo-400 animate-pulse">
-                <span>➔</span> <span>Waiting for next node transition...</span>
-              </div>
-            )}
-            {statusData.status === 'complete' && (
-              <div className="text-emerald-400 font-bold">
-                ✓ Core execution workflow finished successfully. Compile outputs below.
-              </div>
-            )}
-            {(!statusData.notes || statusData.notes.length === 0) && (
-              <div className="text-slate-600 italic">Initializing researcher subprocess...</div>
-            )}
-            <div ref={logEndRef} />
+      {/* Research Footprints Timeline Audit Trail */}
+      {statusData && statusData.status !== 'failed' && statusData.notes && statusData.notes.length > 0 && (
+        <div className="clean-card rounded-3xl p-8 space-y-6">
+          <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider">Research Footprints</h3>
+          <div className="relative border-l border-slate-200 ml-4 pl-6 space-y-6">
+            {statusData.notes.map((note: string, i: number) => {
+              const isLast = i === statusData.notes.length - 1;
+              return (
+                <div key={i} className="relative">
+                  {/* Timeline circle dot */}
+                  <div className={`absolute -left-[31px] top-0.5 w-4.5 h-4.5 rounded-full border flex items-center justify-center ${
+                    isLast && statusData.status === 'running'
+                      ? 'bg-indigo-600 border-indigo-600 text-white animate-pulse'
+                      : 'bg-emerald-500 border-emerald-500 text-white'
+                  }`}>
+                    {isLast && statusData.status === 'running' ? (
+                      <Loader2 className="w-2.5 h-2.5 animate-spin" />
+                    ) : (
+                      <div className="w-1.5 h-1.5 rounded-full bg-white" />
+                    )}
+                  </div>
+                  <div>
+                    <p className={`text-sm font-medium ${isLast ? 'text-slate-800 font-bold' : 'text-slate-600'}`}>
+                      {note}
+                    </p>
+                    <span className="text-[10px] text-slate-400 block mt-0.5">{new Date().toLocaleTimeString()}</span>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
       )}
 
-      {/* Complete Artifacts Display */}
+      {/* Toggleable Technical logs drawer */}
+      {statusData && statusData.status !== 'failed' && statusData.notes && statusData.notes.length > 0 && (
+        <details className="group">
+          <summary className="text-xs font-bold text-slate-500 hover:text-slate-700 cursor-pointer list-none flex items-center gap-1.5 p-2 w-fit rounded-lg hover:bg-slate-100 transition-colors">
+            <Terminal className="w-3.5 h-3.5 text-slate-500" />
+            <span>Show Technical Agent Logs</span>
+            <span className="transition-transform group-open:rotate-90">➔</span>
+          </summary>
+          
+          <div className="mt-3 rounded-2xl overflow-hidden border border-slate-800">
+            <div className="px-5 py-3 bg-slate-900 border-b border-slate-800 flex items-center justify-between">
+              <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Raw Monospace Logs</span>
+              <span className="text-[10px] text-slate-500 font-mono">PAGER=cat</span>
+            </div>
+            <div className="p-6 bg-slate-950 font-mono text-xs text-slate-300 space-y-2 h-[200px] overflow-y-auto">
+              {statusData.notes.map((note: string, i: number) => (
+                <div key={i} className="leading-relaxed flex gap-2">
+                  <span className="text-slate-700 select-none">[{new Date().toLocaleTimeString()}]</span>
+                  <span>{note}</span>
+                </div>
+              ))}
+              {statusData.status === 'running' && (
+                <div className="flex items-center gap-2 text-indigo-400 animate-pulse">
+                  <span>➔</span> <span>Waiting for node transitions...</span>
+                </div>
+              )}
+              <div ref={logEndRef} />
+            </div>
+          </div>
+        </details>
+      )}
+
+      {/* Complete Artifacts Display in White Paper format */}
       {statusData?.status === 'complete' && artifacts.length > 0 && (
-        <div className="space-y-8">
-          <h2 className="text-2xl font-bold text-slate-200 flex items-center gap-2">
-            <FileText className="w-6 h-6 text-indigo-400" /> Constructed Artifacts ({artifacts.length})
+        <div className="space-y-12">
+          <h2 className="text-2xl font-bold text-slate-800 flex items-center gap-2">
+            <FileText className="w-6 h-6 text-indigo-600" /> Constructed Research Artifacts ({artifacts.length})
           </h2>
 
-          <div className="space-y-8">
+          <div className="space-y-12">
             {artifacts.map((art, idx) => (
-              <div key={idx} className="glass-panel rounded-3xl overflow-hidden shadow-xl border border-slate-800/80">
-                {/* Artifact Title header bar */}
-                <div className="px-6 py-4.5 bg-slate-900/60 border-b border-slate-800/80 flex items-center justify-between flex-wrap gap-4">
-                  <div className="flex items-center gap-2.5">
-                    <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping" />
-                    <span className="font-bold text-slate-100 capitalize">{art.type.replace('_', ' ')}</span>
+              <div key={idx} className="paper-sheet rounded-3xl overflow-hidden shadow-md border border-slate-200">
+                
+                {/* Document Metadata Header block */}
+                <div className="p-10 md:p-14 pb-4 border-b border-slate-100 bg-slate-50/50">
+                  <div className="flex justify-between items-start flex-wrap gap-4 mb-8">
+                    <div className="space-y-1">
+                      <span className="text-xs font-bold text-indigo-600 uppercase tracking-widest block">Deep Researcher Document</span>
+                      <h1 className="text-3xl font-black text-slate-900 tracking-tight capitalize">{art.type.replace('_', ' ')}</h1>
+                    </div>
+                    
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => handleCopy(art.content, idx)}
+                        className="p-2 rounded-lg border border-slate-200 hover:border-slate-300 text-slate-500 hover:text-slate-800 hover:bg-white transition-all cursor-pointer"
+                        title="Copy text to clipboard"
+                      >
+                        {copiedIndex === idx ? <ClipboardCheck className="w-4 h-4 text-emerald-600" /> : <Clipboard className="w-4 h-4" />}
+                      </button>
+                      <button
+                        onClick={() => handleDownload(art)}
+                        className="p-2 rounded-lg border border-slate-200 hover:border-slate-300 text-slate-500 hover:text-slate-800 hover:bg-white transition-all cursor-pointer"
+                        title="Download Markdown file"
+                      >
+                        <Download className="w-4 h-4" />
+                      </button>
+                    </div>
                   </div>
 
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => handleCopy(art.content, idx)}
-                      className="p-2 rounded-lg border border-slate-800 hover:border-slate-700 text-slate-400 hover:text-slate-200 transition-colors cursor-pointer"
-                      title="Copy to clipboard"
-                    >
-                      {copiedIndex === idx ? <ClipboardCheck className="w-4 h-4 text-emerald-400" /> : <Clipboard className="w-4 h-4" />}
-                    </button>
-                    <button
-                      onClick={() => handleDownload(art)}
-                      className="p-2 rounded-lg border border-slate-800 hover:border-slate-700 text-slate-400 hover:text-slate-200 transition-colors cursor-pointer"
-                      title="Download Markdown file"
-                    >
-                      <Download className="w-4 h-4" />
-                    </button>
+                  {/* Document Metadata list */}
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-6 text-xs text-slate-500 pt-2 font-sans">
+                    <div className="flex items-center gap-2">
+                      <User className="w-3.5 h-3.5 text-slate-400" />
+                      <div>
+                        <span className="text-slate-400 block uppercase tracking-wider text-[9px] font-bold">Persona Crew</span>
+                        <span className="font-semibold text-slate-700 capitalize">{persona.replace('_', ' ')}</span>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <AlignLeft className="w-3.5 h-3.5 text-slate-400" />
+                      <div>
+                        <span className="text-slate-400 block uppercase tracking-wider text-[9px] font-bold">Research Topic</span>
+                        <span className="font-semibold text-slate-700 truncate block max-w-[200px]">{topic}</span>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Calendar className="w-3.5 h-3.5 text-slate-400" />
+                      <div>
+                        <span className="text-slate-400 block uppercase tracking-wider text-[9px] font-bold">Generated On</span>
+                        <span className="font-semibold text-slate-700">{new Date().toLocaleDateString()}</span>
+                      </div>
+                    </div>
                   </div>
                 </div>
 
-                {/* Artifact markdown rendering body */}
-                <div className="p-8 prose prose-invert prose-indigo max-w-none prose-p:text-slate-300 prose-p:leading-relaxed prose-headings:text-slate-100 prose-headings:font-bold">
+                {/* Formatted Markdown document body */}
+                <div className="p-10 md:p-14 pt-8 doc-prose">
                   <ReactMarkdown>{art.content}</ReactMarkdown>
                 </div>
 
                 {/* Citations section if any exist */}
                 {art.citations && art.citations.length > 0 && (
-                  <div className="px-8 py-5 border-t border-slate-800/60 bg-slate-900/20">
+                  <div className="px-10 md:px-14 py-6 border-t border-slate-100 bg-slate-50/50">
                     <details className="group">
-                      <summary className="text-xs font-bold text-slate-400 hover:text-slate-300 cursor-pointer list-none flex items-center gap-2">
+                      <summary className="text-xs font-bold text-slate-500 hover:text-slate-700 cursor-pointer list-none flex items-center gap-2 font-sans select-none">
                         <span className="transition-transform group-open:rotate-90">➔</span>
-                        Citations & Sources ({art.citations.length})
+                        Sources & Citations ({art.citations.length})
                       </summary>
-                      <ul className="mt-4 space-y-2.5 pl-4 border-l border-slate-800">
+                      <ul className="mt-4 space-y-2.5 pl-4 border-l border-slate-200 font-sans text-xs">
                         {art.citations.map((cite, i) => (
-                          <li key={i} className="text-xs text-slate-400">
-                            <a href={cite} target="_blank" rel="noopener noreferrer" className="text-indigo-400 hover:underline break-all">{cite}</a>
+                          <li key={i} className="text-slate-500 leading-normal">
+                            <a href={cite} target="_blank" rel="noopener noreferrer" className="text-indigo-650 hover:underline break-all">{cite}</a>
                           </li>
                         ))}
                       </ul>
