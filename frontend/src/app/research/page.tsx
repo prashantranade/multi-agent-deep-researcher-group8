@@ -50,6 +50,21 @@ const ARTIFACT_OPTIONS = {
   ]
 };
 
+const SUGGESTED_TOPICS: Record<string, string[]> = {
+  product_manager: [
+    'Comparison of LLM evaluation frameworks',
+    'B2B SaaS pricing model optimizations'
+  ],
+  content_creator: [
+    'SaaS content marketing trends for 2026',
+    'Reaching Gen Z through authentic brand storytelling'
+  ],
+  bharat_desha: [
+    'Jaipur cultural tourism itineraries',
+    'Ecotourism projects in Rajasthan'
+  ]
+};
+
 export default function ResearchWizard() {
   const router = useRouter();
   const [step, setStep] = useState(1);
@@ -193,7 +208,7 @@ export default function ResearchWizard() {
             }`}>
               {s}
             </div>
-            <span className={`text-xs font-bold hidden md:inline ${step === s ? 'text-slate-800' : 'text-slate-400'}`}>
+            <span className={`text-xs font-bold hidden md:inline whitespace-nowrap ${step === s ? 'text-slate-800' : 'text-slate-400'}`}>
               {s === 1 && 'Persona'}
               {s === 2 && 'Topic'}
               {s === 3 && 'Sources'}
@@ -267,8 +282,15 @@ export default function ResearchWizard() {
               <div className="p-4 rounded-xl bg-slate-50 border border-slate-200/60">
                 <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-2">Suggested topics:</span>
                 <div className="flex flex-col gap-2.5 text-sm text-slate-600">
-                  <button onClick={() => setTopic("Jaipur cultural tourism itineraries")} className="text-left hover:text-indigo-600 transition-colors font-medium">➔ Jaipur cultural tourism itineraries</button>
-                  <button onClick={() => setTopic("Comparison of LLM evaluation frameworks")} className="text-left hover:text-indigo-600 transition-colors font-medium">➔ Comparison of LLM evaluation frameworks</button>
+                  {(SUGGESTED_TOPICS[persona] || []).map((t, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => setTopic(t)}
+                      className="text-left hover:text-indigo-600 transition-colors font-medium"
+                    >
+                      ➔ {t}
+                    </button>
+                  ))}
                 </div>
               </div>
             </div>
