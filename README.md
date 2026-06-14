@@ -34,6 +34,7 @@ Activate your Python virtual environment and install dependencies:
 # If using venv:
 python -m venv .venv
 source .venv/bin/activate  # On Linux/macOS
+.venv\Scripts\activate.bat # On Windows CommandLine
 .venv\Scripts\Activate.ps1 # On Windows PowerShell
 
 # Install packages
