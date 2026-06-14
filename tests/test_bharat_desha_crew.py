@@ -227,6 +227,8 @@ def test_social_agent_generates_multiple_platforms():
 def test_bharat_desha_crew_run_returns_crew_output():
     from crews.bharat_desha.crew import BharatDeshaCrew
     from crews.base_crew import ResearchBrief, CrewOutput
+    from crews.tools.tool_context import get_runtime
+    from crews.tools.bd_tools import BD_RETRIEVE_TOOLS, BD_ANALYSE_TOOLS, BD_GENERATE_TOOLS
 
     brief = ResearchBrief(
         topic="Varanasi spiritual tour",
@@ -246,23 +248,29 @@ def test_bharat_desha_crew_run_returns_crew_output():
         "keywords": [{"keyword": "Varanasi spiritual tour", "intent": "informational"}],
         "primary_keyword": "Varanasi spiritual tour"
     }
-    mock_retrieved = [{"text": "Varanasi is sacred...", "metadata": {"source": "https://example.com"}}]
-    mock_analysis = {
-        "spiritual": "Sacred city...", "practical": "Fly to VNS...",
-        "cultural": "Ganga aarti...", "wellness": "Ashrams nearby...",
-        "seasonal": "Oct-March best...",
-        "key_points": ["Visit at dawn"],
-        "citations": ["https://example.com"]
-    }
-    mock_blog = {"type": "blog_post", "content": "# Varanasi Guide\n\n...", "citations": []}
-    mock_social = [{"type": "instagram", "content": "Caption here..."}]
 
-    with patch("crews.bharat_desha.crew.run_trend_agent", return_value=mock_trend), \
-         patch("crews.bharat_desha.crew.run_seo_agent", return_value=mock_seo), \
-         patch("crews.bharat_desha.crew.run_retrieval_agent", return_value=mock_retrieved), \
-         patch("crews.bharat_desha.crew.run_analysis_agent", return_value=mock_analysis), \
-         patch("crews.bharat_desha.crew.run_content_agent", return_value=mock_blog), \
-         patch("crews.bharat_desha.crew.run_social_agent", return_value=mock_social):
+    def react_side_effect(tools, system_prompt, user_message, **kwargs):
+        runtime = get_runtime()
+        if list(tools) == BD_RETRIEVE_TOOLS:
+            runtime.retrieved = [{"text": "Varanasi is sacred...", "metadata": {"source": "https://example.com"}}]
+        elif list(tools) == BD_ANALYSE_TOOLS:
+            runtime.analysis = {
+                "spiritual": "Sacred city...", "practical": "Fly to VNS...",
+                "cultural": "Ganga aarti...", "wellness": "Ashrams nearby...",
+                "seasonal": "Oct-March best...",
+                "key_points": ["Visit at dawn"],
+                "citations": ["https://example.com"]
+            }
+        elif list(tools) == BD_GENERATE_TOOLS:
+            runtime.primary_artifact = {"type": "blog_post", "content": "# Varanasi Guide\n\n...", "citations": []}
+            runtime.artifacts = [
+                runtime.primary_artifact,
+                {"type": "instagram", "content": "Caption here..."},
+            ]
+
+    with patch("crews.bharat_desha.graph.run_trend_agent", return_value=mock_trend), \
+         patch("crews.bharat_desha.graph.run_seo_agent", return_value=mock_seo), \
+         patch("crews.bharat_desha.graph.run_react_phase", side_effect=react_side_effect):
 
         crew = BharatDeshaCrew()
         output = crew.run(brief)
@@ -271,4 +279,26 @@ def test_bharat_desha_crew_run_returns_crew_output():
     artifact_types = [a["type"] for a in output.artifacts]
     assert "blog_post" in artifact_types
     assert "instagram" in artifact_types
-    assert "seo_keywords" in artifact_types   # always included
+    assert "seo_keywords" in artifact_types
+
+
+def test_bharat_desha_crew_run_uses_langgraph():
+    from unittest.mock import MagicMock
+    from crews.bharat_desha.crew import BharatDeshaCrew
+    from crews.base_crew import ResearchBrief, CrewOutput
+
+    crew = BharatDeshaCrew()
+    mock_graph = MagicMock()
+    mock_graph.invoke.return_value = {
+        "artifacts": [{"type": "seo_keywords", "content": "1. keyword", "citations": []}],
+        "trend_context": {},
+        "seo_context": {},
+    }
+    crew._graph = mock_graph
+    brief = ResearchBrief(
+        topic="t", persona="bharat_desha", audience="a", tone="t", depth="standard",
+        selected_artifacts=["blog_post"],
+    )
+    result = crew.run(brief)
+    assert isinstance(result, CrewOutput)
+    mock_graph.invoke.assert_called_once()
