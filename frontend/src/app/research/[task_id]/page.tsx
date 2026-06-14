@@ -346,20 +346,24 @@ export default function LiveTracker() {
 
                 {/* Citations section if any exist */}
                 {art.citations && art.citations.length > 0 && (
-                  <div className="px-10 md:px-14 py-6 border-t border-slate-100 bg-slate-50/50">
-                    <details className="group">
-                      <summary className="text-xs font-bold text-slate-500 hover:text-slate-700 cursor-pointer list-none flex items-center gap-2 font-sans select-none">
-                        <span className="transition-transform group-open:rotate-90">➔</span>
-                        Sources & Citations ({art.citations.length})
-                      </summary>
-                      <ul className="mt-4 space-y-2.5 pl-4 border-l border-slate-200 font-sans text-xs">
-                        {art.citations.map((cite, i) => (
-                          <li key={i} className="text-slate-500 leading-normal">
-                            <a href={cite} target="_blank" rel="noopener noreferrer" className="text-indigo-650 hover:underline break-all">{cite}</a>
-                          </li>
-                        ))}
-                      </ul>
-                    </details>
+                  <div className="px-10 md:px-14 py-8 border-t border-slate-100 bg-slate-50/30">
+                    <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider mb-4 font-sans select-none">
+                      References & Cited Bibliography
+                    </h3>
+                    <ol className="space-y-3 font-sans text-xs text-slate-600 list-decimal pl-5">
+                      {art.citations.map((cite, i) => (
+                        <li key={i} className="leading-relaxed">
+                          <a 
+                            href={cite} 
+                            target="_blank" 
+                            rel="noopener noreferrer" 
+                            className="text-indigo-650 hover:underline break-all font-medium"
+                          >
+                            {cite}
+                          </a>
+                        </li>
+                      ))}
+                    </ol>
                   </div>
                 )}
               </div>
