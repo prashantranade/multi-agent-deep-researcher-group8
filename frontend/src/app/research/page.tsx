@@ -64,6 +64,7 @@ export default function ResearchWizard() {
   const [depth, setDepth] = useState('standard');
   const [selectedArtifacts, setSelectedArtifacts] = useState<string[]>([]);
   const [contextText, setContextText] = useState('');
+  const [uploadedFileName, setUploadedFileName] = useState('');
 
   const [loadingSources, setLoadingSources] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -82,6 +83,28 @@ export default function ResearchWizard() {
     } finally {
       setLoadingSources(false);
     }
+  };
+
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    
+    setUploadedFileName(file.name);
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const text = event.target?.result as string;
+      if (file.name.endsWith('.json')) {
+        try {
+          const parsed = JSON.parse(text);
+          setContextText(JSON.stringify(parsed, null, 2));
+        } catch {
+          setContextText(text);
+        }
+      } else {
+        setContextText(text);
+      }
+    };
+    reader.readAsText(file);
   };
 
   const handleArtifactToggle = (id: string) => {
@@ -142,9 +165,9 @@ export default function ResearchWizard() {
 
   return (
     <div className="max-w-3xl mx-auto mt-6">
-      {/* Step Indicator Header */}
+      {/* Step Indicator Header (7 Steps) */}
       <div className="flex items-center justify-between mb-12 border-b border-slate-200 pb-6">
-        {[1, 2, 3, 4, 5, 6].map((s) => (
+        {[1, 2, 3, 4, 5, 6, 7].map((s) => (
           <div key={s} className="flex items-center gap-2">
             <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-300 ${
               step === s ? 'bg-indigo-600 text-white ring-4 ring-indigo-100' :
@@ -153,15 +176,16 @@ export default function ResearchWizard() {
             }`}>
               {s}
             </div>
-            <span className={`text-xs font-bold hidden sm:inline ${step === s ? 'text-slate-800' : 'text-slate-400'}`}>
+            <span className={`text-xs font-bold hidden md:inline ${step === s ? 'text-slate-800' : 'text-slate-400'}`}>
               {s === 1 && 'Persona'}
               {s === 2 && 'Topic'}
               {s === 3 && 'Sources'}
-              {s === 4 && 'Parameters'}
-              {s === 5 && 'Artifacts'}
-              {s === 6 && 'Review'}
+              {s === 4 && 'Context Docs'}
+              {s === 5 && 'Parameters'}
+              {s === 6 && 'Artifacts'}
+              {s === 7 && 'Review'}
             </span>
-            {s < 6 && <div className="w-4 sm:w-12 h-px bg-slate-200" />}
+            {s < 7 && <div className="w-3 sm:w-8 h-px bg-slate-200" />}
           </div>
         ))}
       </div>
@@ -278,8 +302,51 @@ export default function ResearchWizard() {
           </div>
         )}
 
-        {/* STEP 4: Configuration Parameters */}
+        {/* STEP 4: Context & Document Upload */}
         {step === 4 && (
+          <div>
+            <h2 className="text-2xl font-bold text-slate-900 mb-2 flex items-center gap-2">
+              <FileText className="w-5 h-5 text-indigo-600" /> Upload Documents & Context
+            </h2>
+            <p className="text-sm text-slate-500 mb-8">Include local text files, markdown documentation, transcripts, or notes to help the agentic crew with custom context.</p>
+            
+            <div className="space-y-6">
+              {/* File upload drag-and-drop zone */}
+              <div className="border-2 border-dashed border-slate-200 hover:border-indigo-500 rounded-2xl p-8 text-center transition-colors bg-slate-50/50">
+                <input
+                  type="file"
+                  id="file-upload"
+                  onChange={handleFileUpload}
+                  accept=".txt,.md,.json,.csv"
+                  className="hidden"
+                />
+                <label htmlFor="file-upload" className="cursor-pointer space-y-3 block">
+                  <div className="p-3 bg-white w-fit rounded-xl border border-slate-150 mx-auto shadow-sm">
+                    <ArrowRight className="w-5 h-5 text-indigo-600 rotate-90" />
+                  </div>
+                  <div className="text-sm font-bold text-slate-800">
+                    {uploadedFileName ? `Selected: ${uploadedFileName}` : 'Select context document file'}
+                  </div>
+                  <div className="text-xs text-slate-400">Supports TXT, MD, JSON, or CSV (Max 5MB)</div>
+                </label>
+              </div>
+
+              <div>
+                <label className="text-xs font-bold uppercase tracking-wider text-slate-400 block mb-2">Custom Context Notes</label>
+                <textarea
+                  rows={5}
+                  value={contextText}
+                  onChange={(e) => setContextText(e.target.value)}
+                  placeholder="Paste context contents here, or upload a document above..."
+                  className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-slate-800 placeholder-slate-400 focus:outline-none focus:border-indigo-500 transition-colors resize-none text-sm font-mono leading-relaxed"
+                />
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* STEP 5: Configuration Parameters */}
+        {step === 5 && (
           <div>
             <h2 className="text-2xl font-bold text-slate-900 mb-2 flex items-center gap-2">
               <Settings className="w-5 h-5 text-indigo-600" /> Setup Configuration
@@ -337,8 +404,8 @@ export default function ResearchWizard() {
           </div>
         )}
 
-        {/* STEP 5: Selected Artifacts */}
-        {step === 5 && (
+        {/* STEP 6: Selected Artifacts */}
+        {step === 6 && (
           <div>
             <h2 className="text-2xl font-bold text-slate-900 mb-2 flex items-center gap-2">
               <CheckSquare className="w-5 h-5 text-indigo-600" /> Target Artifacts
@@ -373,26 +440,16 @@ export default function ResearchWizard() {
           </div>
         )}
 
-        {/* STEP 6: Review & Context */}
-        {step === 6 && (
+        {/* STEP 7: Review & Final Checklist */}
+        {step === 7 && (
           <div>
             <h2 className="text-2xl font-bold text-slate-900 mb-2 flex items-center gap-2">
-              <FileText className="w-5 h-5 text-indigo-600" /> Review Brief & Add Context
+              <FileText className="w-5 h-5 text-indigo-600" /> Review Brief & Sources
             </h2>
-            <p className="text-sm text-slate-500 mb-8">Optionally insert custom document snippets, raw notes, or target requirements before deploying the crew.</p>
+            <p className="text-sm text-slate-500 mb-8">Verify the selected parameters, custom context files, and bibliography list before launching.</p>
             
             <div className="space-y-6">
-              <div>
-                <label className="text-xs font-bold uppercase tracking-wider text-slate-400 block mb-2">Additional Context & Documents (Optional)</label>
-                <textarea
-                  rows={4}
-                  value={contextText}
-                  onChange={(e) => setContextText(e.target.value)}
-                  placeholder="Paste transcripts, background details, company URLs, or constraints..."
-                  className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-slate-800 placeholder-slate-400 focus:outline-none focus:border-indigo-500 transition-colors resize-none"
-                />
-              </div>
-
+              {/* Summary metadata */}
               <div className="grid grid-cols-2 gap-4 text-sm p-5 rounded-2xl bg-slate-50 border border-slate-200/60">
                 <div>
                   <span className="text-slate-400 block text-xs font-bold uppercase tracking-wider mb-0.5">Persona Crew</span>
@@ -407,10 +464,35 @@ export default function ResearchWizard() {
                   <span className="text-slate-800 font-semibold">{tone} / {audience}</span>
                 </div>
                 <div>
-                  <span className="text-slate-400 block text-xs font-bold uppercase tracking-wider mb-0.5">Artifacts Selected</span>
-                  <span className="text-slate-800 font-semibold">{selectedArtifacts.length} total</span>
+                  <span className="text-slate-400 block text-xs font-bold uppercase tracking-wider mb-0.5">Artifacts</span>
+                  <span className="text-slate-800 font-semibold">{selectedArtifacts.length} selected</span>
                 </div>
               </div>
+
+              {/* Curated Citations/Sources check-preview list */}
+              {selectedSources.length > 0 && (
+                <div className="space-y-2.5">
+                  <span className="text-xs font-bold uppercase tracking-wider text-slate-450 block">Target Bibliography to Cite ({selectedSources.length})</span>
+                  <div className="border border-slate-200 rounded-xl divide-y divide-slate-100 max-h-[140px] overflow-y-auto bg-white px-4">
+                    {selectedSources.map((s, i) => (
+                      <div key={i} className="py-2.5 flex items-center justify-between text-xs text-slate-700">
+                        <span className="font-semibold truncate max-w-[320px]">{s.title}</span>
+                        <span className="text-[10px] text-slate-400 font-mono px-2 py-0.5 bg-slate-50 border border-slate-150 rounded">{s.domain}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Uploaded Context check */}
+              {contextText && (
+                <div className="space-y-2">
+                  <span className="text-xs font-bold uppercase tracking-wider text-slate-455 block">Uploaded Context Preview</span>
+                  <div className="border border-slate-200 rounded-xl bg-slate-50 p-4 max-h-[100px] overflow-y-auto text-xs text-slate-500 font-mono whitespace-pre-wrap">
+                    {contextText}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         )}
@@ -441,7 +523,7 @@ export default function ResearchWizard() {
                 </>
               )}
             </button>
-          ) : step === 6 ? (
+          ) : step === 7 ? (
             <button
               onClick={handleLaunch}
               disabled={submitting}
@@ -460,7 +542,7 @@ export default function ResearchWizard() {
           ) : (
             <button
               onClick={() => setStep(step + 1)}
-              disabled={(step === 3 && selectedSources.length === 0) || (step === 5 && selectedArtifacts.length === 0)}
+              disabled={(step === 3 && selectedSources.length === 0) || (step === 6 && selectedArtifacts.length === 0)}
               className="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-white font-semibold primary-button text-sm disabled:opacity-50 cursor-pointer"
             >
               Continue <ChevronRight className="w-4 h-4" />
