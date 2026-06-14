@@ -1,8 +1,8 @@
 @import "tailwindcss";
 
 :root {
-  --background: #080a12;
-  --foreground: #f8fafc;
+  --background: #f8fafc;
+  --foreground: #0f172a;
 }
 
 @theme inline {
@@ -17,44 +17,144 @@ body {
   font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 }
 
-/* Glassmorphism custom components */
-.glass-panel {
-  background: rgba(15, 23, 42, 0.45);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+/* Minimalist Clean Components */
+.clean-panel {
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(15, 23, 42, 0.08);
 }
 
-.glass-card {
-  background: rgba(30, 41, 59, 0.4);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+.clean-card {
+  background: #ffffff;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02), 0 1px 2px rgba(0, 0, 0, 0.04);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.glass-card:hover {
-  background: rgba(30, 41, 59, 0.65);
-  border-color: rgba(99, 102, 241, 0.35);
-  box-shadow: 0 0 25px rgba(99, 102, 241, 0.15);
-  transform: translateY(-2px);
+.clean-card:hover {
+  border-color: rgba(99, 102, 241, 0.4);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.03);
+  transform: translateY(-1px);
 }
 
-.glow-button {
-  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
-  box-shadow: 0 0 15px rgba(99, 102, 241, 0.3);
+.primary-button {
+  background: #0f172a;
+  color: #ffffff;
   transition: all 0.2s ease;
+  border: 1px solid #0f172a;
 }
 
-.glow-button:hover:not(:disabled) {
-  box-shadow: 0 0 25px rgba(99, 102, 241, 0.6);
-  transform: scale(1.02);
+.primary-button:hover:not(:disabled) {
+  background: #1e293b;
+  border-color: #1e293b;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
 
-.glow-button:active:not(:disabled) {
-  transform: scale(0.98);
+.primary-button:active:not(:disabled) {
+  transform: translateY(0);
 }
 
-.live-glow {
-  box-shadow: 0 0 10px rgba(168, 85, 247, 0.5);
+/* Document Specific Styling (The Paper Sheet) */
+.paper-sheet {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.03), 0 2px 4px -1px rgba(0, 0, 0, 0.01), 0 20px 25px -5px rgba(0, 0, 0, 0.02);
+}
+
+/* Typography styles for markdown content in the document */
+.doc-prose {
+  font-family: Georgia, Cambria, "Times New Roman", Times, serif;
+  color: #334155;
+  line-height: 1.8;
+  font-size: 1.05rem;
+}
+
+.doc-prose h1, .doc-prose h2, .doc-prose h3, .doc-prose h4 {
+  font-family: ui-sans-serif, system-ui, -apple-system, sans-serif;
+  color: #0f172a;
+  font-weight: 700;
+  margin-top: 1.8em;
+  margin-bottom: 0.6em;
+}
+
+.doc-prose h1 {
+  font-size: 1.8rem;
+  border-bottom: 1px solid #e2e8f0;
+  padding-bottom: 0.3em;
+}
+
+.doc-prose h2 {
+  font-size: 1.4rem;
+}
+
+.doc-prose h3 {
+  font-size: 1.15rem;
+}
+
+.doc-prose p {
+  margin-bottom: 1.25em;
+}
+
+.doc-prose ul, .doc-prose ol {
+  margin-bottom: 1.25em;
+  padding-left: 1.5em;
+}
+
+.doc-prose li {
+  margin-bottom: 0.4em;
+}
+
+.doc-prose code {
+  font-family: monospace;
+  background: #f1f5f9;
+  padding: 0.2em 0.4em;
+  border-radius: 0.25rem;
+  font-size: 0.9em;
+  color: #0f172a;
+}
+
+.doc-prose pre {
+  background: #0f172a;
+  color: #f8fafc;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  overflow-x: auto;
+  margin-bottom: 1.25em;
+}
+
+.doc-prose pre code {
+  background: transparent;
+  color: inherit;
+  padding: 0;
+}
+
+.doc-prose blockquote {
+  border-left: 4px solid #cbd5e1;
+  padding-left: 1rem;
+  color: #475569;
+  font-style: italic;
+  margin-bottom: 1.25em;
+}
+
+.doc-prose a {
+  color: #2563eb;
+  text-decoration: underline;
+}
+
+.doc-prose table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 1.5em;
+}
+
+.doc-prose th, .doc-prose td {
+  border: 1px solid #cbd5e1;
+  padding: 0.5rem 0.75rem;
+  text-align: left;
+}
+
+.doc-prose th {
+  background: #f1f5f9;
 }
