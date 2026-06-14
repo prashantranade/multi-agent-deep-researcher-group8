@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { discoverSources, startResearch } from '@/lib/api';
+import { discoverSources, startResearch, uploadDocument } from '@/lib/api';
 import { Source } from '@/lib/types';
 import { Sparkles, Globe, User, Settings, CheckSquare, FileText, ChevronRight, ChevronLeft, Loader2, ArrowRight } from 'lucide-react';
 
@@ -65,6 +65,7 @@ export default function ResearchWizard() {
   const [selectedArtifacts, setSelectedArtifacts] = useState<string[]>([]);
   const [contextText, setContextText] = useState('');
   const [uploadedFileName, setUploadedFileName] = useState('');
+  const [parsingDocument, setParsingDocument] = useState(false);
 
   const [loadingSources, setLoadingSources] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -85,26 +86,42 @@ export default function ResearchWizard() {
     }
   };
 
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
     
     setUploadedFileName(file.name);
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      const text = event.target?.result as string;
-      if (file.name.endsWith('.json')) {
-        try {
-          const parsed = JSON.parse(text);
-          setContextText(JSON.stringify(parsed, null, 2));
-        } catch {
+    const filename = file.name.toLowerCase();
+    
+    if (filename.endsWith('.pdf') || filename.endsWith('.docx')) {
+      setParsingDocument(true);
+      try {
+        const res = await uploadDocument(file);
+        setContextText(res.text);
+      } catch (err) {
+        alert('Failed to parse document. Ensure the backend API server is running.');
+        setUploadedFileName('');
+      } finally {
+        setParsingDocument(false);
+      }
+    } else {
+      // client-side reader for txt, md, json, csv
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const text = event.target?.result as string;
+        if (file.name.endsWith('.json')) {
+          try {
+            const parsed = JSON.parse(text);
+            setContextText(JSON.stringify(parsed, null, 2));
+          } catch {
+            setContextText(text);
+          }
+        } else {
           setContextText(text);
         }
-      } else {
-        setContextText(text);
-      }
-    };
-    reader.readAsText(file);
+      };
+      reader.readAsText(file);
+    }
   };
 
   const handleArtifactToggle = (id: string) => {
@@ -317,17 +334,28 @@ export default function ResearchWizard() {
                   type="file"
                   id="file-upload"
                   onChange={handleFileUpload}
-                  accept=".txt,.md,.json,.csv"
+                  accept=".txt,.md,.json,.csv,.pdf,.docx"
+                  disabled={parsingDocument}
                   className="hidden"
                 />
-                <label htmlFor="file-upload" className="cursor-pointer space-y-3 block">
-                  <div className="p-3 bg-white w-fit rounded-xl border border-slate-150 mx-auto shadow-sm">
-                    <ArrowRight className="w-5 h-5 text-indigo-600 rotate-90" />
-                  </div>
-                  <div className="text-sm font-bold text-slate-800">
-                    {uploadedFileName ? `Selected: ${uploadedFileName}` : 'Select context document file'}
-                  </div>
-                  <div className="text-xs text-slate-400">Supports TXT, MD, JSON, or CSV (Max 5MB)</div>
+                <label htmlFor="file-upload" className={`space-y-3 block ${parsingDocument ? 'pointer-events-none' : 'cursor-pointer'}`}>
+                  {parsingDocument ? (
+                    <div className="flex flex-col items-center justify-center space-y-3 py-2">
+                      <Loader2 className="w-8 h-8 animate-spin text-indigo-600" />
+                      <div className="text-sm font-bold text-slate-800 animate-pulse">Extracting text context...</div>
+                      <div className="text-xs text-slate-400">Processing {uploadedFileName}</div>
+                    </div>
+                  ) : (
+                    <>
+                      <div className="p-3 bg-white w-fit rounded-xl border border-slate-150 mx-auto shadow-sm">
+                        <ArrowRight className="w-5 h-5 text-indigo-600 rotate-90" />
+                      </div>
+                      <div className="text-sm font-bold text-slate-800">
+                        {uploadedFileName ? `Selected: ${uploadedFileName}` : 'Select context document file'}
+                      </div>
+                      <div className="text-xs text-slate-400">Supports TXT, MD, JSON, CSV, PDF, or DOCX (Max 5MB)</div>
+                    </>
+                  )}
                 </label>
               </div>
 
@@ -336,9 +364,10 @@ export default function ResearchWizard() {
                 <textarea
                   rows={5}
                   value={contextText}
+                  disabled={parsingDocument}
                   onChange={(e) => setContextText(e.target.value)}
-                  placeholder="Paste context contents here, or upload a document above..."
-                  className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-slate-800 placeholder-slate-400 focus:outline-none focus:border-indigo-500 transition-colors resize-none text-sm font-mono leading-relaxed"
+                  placeholder={parsingDocument ? "Extracting text context..." : "Paste context contents here, or upload a document above..."}
+                  className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-slate-800 placeholder-slate-400 focus:outline-none focus:border-indigo-500 transition-colors resize-none text-sm font-mono leading-relaxed disabled:opacity-50"
                 />
               </div>
             </div>
@@ -501,8 +530,8 @@ export default function ResearchWizard() {
         <div className="flex items-center justify-between mt-10 border-t border-slate-200 pt-6">
           <button
             onClick={() => setStep(step - 1)}
-            disabled={step === 1 || submitting}
-            className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl border border-slate-200 hover:border-slate-300 text-sm font-semibold text-slate-500 hover:text-slate-700 disabled:opacity-30 disabled:pointer-events-none transition-all cursor-pointer"
+            disabled={step === 1 || submitting || parsingDocument}
+            className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl border border-slate-200 hover:border-slate-350 text-sm font-semibold text-slate-500 hover:text-slate-700 disabled:opacity-30 disabled:pointer-events-none transition-all cursor-pointer"
           >
             <ChevronLeft className="w-4 h-4" /> Back
           </button>
@@ -542,7 +571,7 @@ export default function ResearchWizard() {
           ) : (
             <button
               onClick={() => setStep(step + 1)}
-              disabled={(step === 3 && selectedSources.length === 0) || (step === 6 && selectedArtifacts.length === 0)}
+              disabled={(step === 3 && selectedSources.length === 0) || (step === 6 && selectedArtifacts.length === 0) || parsingDocument}
               className="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-white font-semibold primary-button text-sm disabled:opacity-50 cursor-pointer"
             >
               Continue <ChevronRight className="w-4 h-4" />
