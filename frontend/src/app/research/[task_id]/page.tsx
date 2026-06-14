@@ -5,6 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { getResearchStatus, getResearchResults } from '@/lib/api';
 import { Artifact, TaskStatusResponse } from '@/lib/types';
 import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import { Loader2, CheckCircle2, XCircle, Terminal, ClipboardCheck, Clipboard, Download, ArrowLeft, FileText, Calendar, User, AlignLeft } from 'lucide-react';
 
 // Node graphs configurations
@@ -362,7 +363,7 @@ export default function LiveTracker() {
 
                 {/* Formatted Markdown document body */}
                 <div className="p-10 md:p-14 pt-8 doc-prose">
-                  <ReactMarkdown>{art.content}</ReactMarkdown>
+                  <ReactMarkdown remarkPlugins={[remarkGfm]}>{art.content}</ReactMarkdown>
                 </div>
 
                 {/* Citations section if any exist */}

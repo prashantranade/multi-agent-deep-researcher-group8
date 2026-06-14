@@ -145,16 +145,50 @@ body {
 
 .doc-prose table {
   width: 100%;
-  border-collapse: collapse;
-  margin-bottom: 1.5em;
-}
-
-.doc-prose th, .doc-prose td {
-  border: 1px solid #cbd5e1;
-  padding: 0.5rem 0.75rem;
-  text-align: left;
+  border-collapse: separate;
+  border-spacing: 0;
+  margin: 1.75em 0;
+  font-family: ui-sans-serif, system-ui, -apple-system, sans-serif;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  overflow: hidden;
 }
 
 .doc-prose th {
-  background: #f1f5f9;
+  background: #f8fafc;
+  color: #0f172a;
+  font-weight: 700;
+  padding: 0.85rem 1.15rem;
+  text-align: left;
+  border-bottom: 2px solid #e2e8f0;
+  border-right: 1px solid #e2e8f0;
+}
+
+.doc-prose th:last-child {
+  border-right: none;
+}
+
+.doc-prose td {
+  padding: 0.85rem 1.15rem;
+  color: #475569;
+  border-bottom: 1px solid #f1f5f9;
+  border-right: 1px solid #e2e8f0;
+}
+
+.doc-prose td:last-child {
+  border-right: none;
+}
+
+.doc-prose tr:last-child td {
+  border-bottom: none;
+}
+
+.doc-prose tr:nth-child(even) td {
+  background: rgba(248, 250, 252, 0.6);
+}
+
+.doc-prose tr:hover td {
+  background: rgba(241, 245, 249, 0.4);
 }
