@@ -1,7 +1,8 @@
 # crews/product_manager/output_agent.py
 import json
 from typing import List, Dict, Any
-from infrastructure.llm_client import chat_with_fallback
+from langchain_core.messages import HumanMessage
+from infrastructure.llm_client import get_llm
 from outputs.product_manager.templates import (
     RESEARCH_BRIEF_PROMPT,
     COMPETITIVE_SUMMARY_PROMPT,
@@ -16,10 +17,9 @@ class PMOutputAgent:
         self.model = config.OUTPUT_MODEL
 
     def _generate(self, prompt: str) -> str:
-        return chat_with_fallback(
-            messages=[{"role": "user", "content": prompt}],
-            model=self.model,
-        )
+        llm = get_llm(self.model)
+        response = llm.invoke([HumanMessage(content=prompt)])
+        return str(response.content)
 
     def generate_artifacts(
         self, analysis: Dict[str, Any], selected_artifacts: List[str]

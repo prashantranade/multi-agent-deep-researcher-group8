@@ -9,6 +9,7 @@ def test_bharat_desha_table_config():
 
 
 from unittest.mock import patch, MagicMock
+from langchain_core.messages import AIMessage
 
 def test_trend_agent_returns_structured_output():
     from crews.bharat_desha.trend_agent import run_trend_agent
@@ -21,7 +22,7 @@ def test_trend_agent_returns_structured_output():
         ]
     }
 
-    mock_llm_response = """{
+    mock_llm_response = AIMessage(content="""{
         "trends": ["Varanasi pilgrimages trending in 2025", "Yoga retreats in Rishikesh up 30%"],
         "seasonality": {
             "best_months": ["October", "November", "February", "March"],
@@ -34,10 +35,13 @@ def test_trend_agent_returns_structured_output():
             "Rishikesh yoga retreat 7-day itinerary",
             "Best temples in Varanasi during Diwali"
         ]
-    }"""
+    }""")
 
     with patch("crews.bharat_desha.trend_agent.TavilyClient", return_value=mock_tavily), \
-         patch("crews.bharat_desha.trend_agent.chat_with_fallback", return_value=mock_llm_response):
+         patch("crews.bharat_desha.trend_agent.get_llm") as mock_get_llm:
+        mock_llm = MagicMock()
+        mock_llm.invoke.return_value = mock_llm_response
+        mock_get_llm.return_value = mock_llm
         result = run_trend_agent("spiritual destinations Varanasi")
 
     assert "trends" in result
@@ -57,7 +61,7 @@ def test_seo_agent_returns_ten_keywords():
         ]
     }
 
-    mock_llm_response = """{
+    mock_llm_response = AIMessage(content="""{
         "keywords": [
             {"keyword": "Varanasi spiritual tour", "intent": "informational"},
             {"keyword": "Kashi Vishwanath temple guide", "intent": "informational"},
@@ -71,12 +75,15 @@ def test_seo_agent_returns_ten_keywords():
             {"keyword": "Varanasi travel tips first time", "intent": "informational"}
         ],
         "primary_keyword": "Varanasi spiritual tour"
-    }"""
+    }""")
 
     trend_context = {"trends": ["Varanasi pilgrimages trending"], "seasonality": {}, "topic_suggestions": []}
 
     with patch("crews.bharat_desha.seo_agent.TavilyClient", return_value=mock_tavily), \
-         patch("crews.bharat_desha.seo_agent.chat_with_fallback", return_value=mock_llm_response):
+         patch("crews.bharat_desha.seo_agent.get_llm") as mock_get_llm:
+        mock_llm = MagicMock()
+        mock_llm.invoke.return_value = mock_llm_response
+        mock_get_llm.return_value = mock_llm
         result = run_seo_agent("Varanasi spiritual tour", trend_context)
 
     assert "keywords" in result
@@ -125,7 +132,7 @@ def test_analysis_agent_returns_bharat_desha_lens():
     seo_context = {"keywords": [{"keyword": "Varanasi spiritual tour", "intent": "informational"}], "primary_keyword": "Varanasi spiritual tour"}
     trend_context = {"seasonality": {"best_months": ["October", "March"], "active_festivals": ["Diwali"]}, "trends": []}
 
-    mock_response = """{
+    mock_response = AIMessage(content="""{
         "spiritual": "Varanasi is the abode of Lord Shiva, one of the 12 Jyotirlingas...",
         "practical": "Fly to Varanasi airport (VNS), auto-rickshaw to ghats costs 150 INR...",
         "cultural": "Ganga aarti at Dashashwamedh Ghat runs every evening at 7pm...",
@@ -133,9 +140,12 @@ def test_analysis_agent_returns_bharat_desha_lens():
         "seasonal": "October to March is ideal; avoid June-August monsoon...",
         "key_points": ["Visit Kashi Vishwanath temple at dawn", "Sunrise boat ride on the Ganga"],
         "citations": ["https://example.com"]
-    }"""
+    }""")
 
-    with patch("crews.bharat_desha.analysis_agent.chat_with_fallback", return_value=mock_response):
+    with patch("crews.bharat_desha.analysis_agent.get_llm") as mock_get_llm:
+        mock_llm = MagicMock()
+        mock_llm.invoke.return_value = mock_response
+        mock_get_llm.return_value = mock_llm
         result = run_analysis_agent(retrieved, seo_context, trend_context)
 
     for key in ["spiritual", "practical", "cultural", "wellness", "seasonal", "key_points", "citations"]:
@@ -160,9 +170,12 @@ def test_content_agent_generates_blog_post():
         "primary_keyword": "Varanasi spiritual tour"
     }
 
-    mock_response = "# Varanasi Spiritual Tour: Your Complete Guide\n\nVaranasi spiritual tour begins at dawn on the banks of the sacred Ganga river, one of the holiest journeys in Sanatan Dharma."
+    mock_response = AIMessage(content="# Varanasi Spiritual Tour: Your Complete Guide\n\nVaranasi spiritual tour begins at dawn on the banks of the sacred Ganga river, one of the holiest journeys in Sanatan Dharma.")
 
-    with patch("crews.bharat_desha.content_agent.chat_with_fallback", return_value=mock_response):
+    with patch("crews.bharat_desha.content_agent.get_llm") as mock_get_llm:
+        mock_llm = MagicMock()
+        mock_llm.invoke.return_value = mock_response
+        mock_get_llm.return_value = mock_llm
         result = run_content_agent(analysis, seo_context, artifact_type="blog_post", tone="warm", depth="standard")
 
     assert result["type"] == "blog_post"
@@ -180,9 +193,12 @@ def test_content_agent_generates_itinerary():
     }
     seo_context = {"keywords": [], "primary_keyword": "Varanasi itinerary"}
 
-    mock_response = "## Day 1: Arrival in Varanasi\n\nCheck into your hotel near Assi Ghat..."
+    mock_response = AIMessage(content="## Day 1: Arrival in Varanasi\n\nCheck into your hotel near Assi Ghat...")
 
-    with patch("crews.bharat_desha.content_agent.chat_with_fallback", return_value=mock_response):
+    with patch("crews.bharat_desha.content_agent.get_llm") as mock_get_llm:
+        mock_llm = MagicMock()
+        mock_llm.invoke.return_value = mock_response
+        mock_get_llm.return_value = mock_llm
         result = run_content_agent(analysis, seo_context, artifact_type="itinerary", tone="practical", depth="deep")
 
     assert result["type"] == "itinerary"
@@ -200,9 +216,12 @@ def test_social_agent_generates_instagram():
     key_points = ["Visit Kashi Vishwanath at dawn", "Sunrise boat ride on the Ganga"]
     seo_context = {"primary_keyword": "Varanasi spiritual tour", "keywords": []}
 
-    mock_response = "Step into the sacred energy of Varanasi The ghats come alive at dawn...\n\n#VaranasiTravel #SpiritualIndia #BharatDesha"
+    mock_response = AIMessage(content="Step into the sacred energy of Varanasi The ghats come alive at dawn...\n\n#VaranasiTravel #SpiritualIndia #BharatDesha")
 
-    with patch("crews.bharat_desha.social_agent.chat_with_fallback", return_value=mock_response):
+    with patch("crews.bharat_desha.social_agent.get_llm") as mock_get_llm:
+        mock_llm = MagicMock()
+        mock_llm.invoke.return_value = mock_response
+        mock_get_llm.return_value = mock_llm
         results = run_social_agent(primary_artifact, key_points, seo_context, platforms=["instagram"])
 
     assert len(results) == 1
@@ -216,7 +235,10 @@ def test_social_agent_generates_multiple_platforms():
     key_points = ["Key point 1"]
     seo_context = {"primary_keyword": "Varanasi guide", "keywords": []}
 
-    with patch("crews.bharat_desha.social_agent.chat_with_fallback", return_value="mock social content"):
+    with patch("crews.bharat_desha.social_agent.get_llm") as mock_get_llm:
+        mock_llm = MagicMock()
+        mock_llm.invoke.return_value = AIMessage(content="mock social content")
+        mock_get_llm.return_value = mock_llm
         results = run_social_agent(primary_artifact, key_points, seo_context, platforms=["instagram", "facebook", "x_post", "youtube"])
 
     assert len(results) == 4

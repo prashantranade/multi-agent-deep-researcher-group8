@@ -1,6 +1,7 @@
 # crews/content_creator/output_agent.py
 from typing import List, Dict, Any
-from infrastructure.llm_client import chat_with_fallback
+from infrastructure.llm_client import get_llm
+from langchain_core.messages import HumanMessage
 from outputs.content_creator.templates import (
     CONTENT_BRIEF_PROMPT,
     SOCIAL_DRAFT_PROMPT,
@@ -13,7 +14,9 @@ import config
 
 class CCOutputAgent:
     def _generate(self, prompt: str) -> str:
-        return chat_with_fallback([{"role": "user", "content": prompt}], model=config.OUTPUT_MODEL)
+        llm = get_llm(config.OUTPUT_MODEL)
+        response = llm.invoke([HumanMessage(content=prompt)])
+        return str(response.content)
 
     def generate_artifacts(
         self, analysis: Dict[str, Any], selected_artifacts: List[str]

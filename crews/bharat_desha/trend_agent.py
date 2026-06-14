@@ -2,7 +2,8 @@
 import json
 from datetime import datetime
 from tavily import TavilyClient
-from infrastructure.llm_client import chat_with_fallback
+from langchain_core.messages import HumanMessage
+from infrastructure.llm_client import get_llm
 import config
 
 
@@ -31,13 +32,13 @@ Research:
 
 Return only valid JSON. No markdown, no explanation."""
 
-    response = chat_with_fallback(
-        messages=[{"role": "user", "content": prompt}],
-        model=config.INTAKE_MODEL,
-    )
+    llm = get_llm(config.INTAKE_MODEL)
+    response = llm.invoke([HumanMessage(content=prompt)])
+    response_text = response.content
+
 
     try:
-        text = response.strip()
+        text = response_text.strip()
         if text.startswith("```"):
             import re
             text = re.sub(r"^```(?:json)?\s*", "", text)
@@ -45,7 +46,7 @@ Return only valid JSON. No markdown, no explanation."""
         return json.loads(text)
     except (json.JSONDecodeError, ValueError):
         return {
-            "trends": [response] if response else [],
+            "trends": [response_text] if response_text else [],
             "seasonality": {"best_months": [], "avoid_months": [], "active_festivals": [], "advisories": []},
             "topic_suggestions": [topic],
         }

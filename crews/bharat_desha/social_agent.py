@@ -1,5 +1,6 @@
 from typing import List, Dict
-from infrastructure.llm_client import chat_with_fallback
+from langchain_core.messages import HumanMessage
+from infrastructure.llm_client import get_llm
 import config
 
 _PLATFORM_PROMPTS = {
@@ -50,10 +51,10 @@ Article excerpt:
 
 Write the content now."""
 
-        content = chat_with_fallback(
-            messages=[{"role": "user", "content": prompt}],
-            model=config.OUTPUT_MODEL,
-        )
+        llm = get_llm(config.OUTPUT_MODEL)
+        response = llm.invoke([HumanMessage(content=prompt)])
+        content = response.content
         artifacts.append({"type": platform, "content": content})
 
     return artifacts
+

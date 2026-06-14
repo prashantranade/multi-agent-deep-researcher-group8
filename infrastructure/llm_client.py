@@ -1,41 +1,37 @@
 # infrastructure/llm_client.py
 from typing import List, Dict, Any
-import openai
+from langchain_openai import ChatOpenAI
+from langchain_core.messages import SystemMessage, HumanMessage, AIMessage
 import config
 
-_PROVIDERS = [
-    {
-        "name": "openrouter",
-        "base_url": "https://openrouter.ai/api/v1",
-        "api_key_attr": "OPENROUTER_API_KEY",
-        "model_override": None,          # use the model requested as-is
-    },
-    {
-        "name": "zai",
-        "base_url": "https://open.bigmodel.cn/api/paas/v4/",
-        "api_key_attr": "ZAI_API_KEY",
-        "model_override": "glm-4-air",  # Z.ai free fallback model
-    },
-]
-
-def _call_provider(provider: Dict, messages: List[Dict], model: str) -> Any:
-    client = openai.OpenAI(
-        api_key=getattr(config, provider["api_key_attr"]),
-        base_url=provider["base_url"],
+def get_llm(model: str) -> Any:
+    """Returns a ChatOpenAI model with secondary Z.ai fallback."""
+    primary = ChatOpenAI(
+        model=model,
+        openai_api_key=config.OPENROUTER_API_KEY or "dummy_key",
+        openai_api_base="https://openrouter.ai/api/v1",
     )
-    effective_model = provider["model_override"] or model
-    return client.chat.completions.create(
-        model=effective_model,
-        messages=messages,
+    fallback = ChatOpenAI(
+        model="glm-4-air",
+        openai_api_key=config.ZAI_API_KEY or "dummy_key",
+        openai_api_base="https://open.bigmodel.cn/api/paas/v4/",
     )
+    return primary.with_fallbacks([fallback])
 
 def chat_with_fallback(messages: List[Dict[str, str]], model: str) -> str:
-    last_error = None
-    for provider in _PROVIDERS:
-        try:
-            response = _call_provider(provider, messages, model)
-            return response.choices[0].message.content or ""
-        except (openai.RateLimitError, openai.APIStatusError, openai.APIConnectionError) as e:
-            last_error = e
-            continue
-    raise RuntimeError(f"All LLM providers exhausted. Last error: {last_error}")
+    llm = get_llm(model)
+    lc_messages = []
+    for m in messages:
+        role = m.get("role")
+        content = m.get("content", "")
+        if role == "system":
+            lc_messages.append(SystemMessage(content=content))
+        elif role == "user":
+            lc_messages.append(HumanMessage(content=content))
+        elif role == "assistant":
+            lc_messages.append(AIMessage(content=content))
+        else:
+            lc_messages.append(HumanMessage(content=content))
+    response = llm.invoke(lc_messages)
+    return str(response.content)
+

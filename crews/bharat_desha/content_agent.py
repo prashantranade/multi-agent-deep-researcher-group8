@@ -1,5 +1,6 @@
 from typing import Dict
-from infrastructure.llm_client import chat_with_fallback
+from langchain_core.messages import HumanMessage
+from infrastructure.llm_client import get_llm
 import config
 
 _ARTIFACT_INSTRUCTIONS = {
@@ -32,13 +33,13 @@ Research summary:
 
 Write the content now. Use markdown formatting."""
 
-    content = chat_with_fallback(
-        messages=[{"role": "user", "content": prompt}],
-        model=config.OUTPUT_MODEL,
-    )
+    llm = get_llm(config.OUTPUT_MODEL)
+    response = llm.invoke([HumanMessage(content=prompt)])
+    content = response.content
 
     return {
         "type": artifact_type,
         "content": content,
         "citations": analysis.get("citations", []),
     }
+
