@@ -21,46 +21,46 @@ export default function HistoryLogs() {
 
   return (
     <div className="max-w-4xl mx-auto space-y-8">
-      <div className="flex items-center gap-3 border-b border-slate-800/80 pb-6">
-        <History className="w-8 h-8 text-indigo-400" />
+      <div className="flex items-center gap-3 border-b border-slate-200 pb-6">
+        <History className="w-8 h-8 text-indigo-600" />
         <div>
-          <h1 className="text-2xl font-bold text-slate-200">Research Logs History</h1>
+          <h1 className="text-2xl font-bold text-slate-800">Research Logs History</h1>
           <p className="text-sm text-slate-500">Track and retrieve output documents from your past crew executions.</p>
         </div>
       </div>
 
-      <div className="glass-panel rounded-3xl overflow-hidden">
+      <div className="clean-card rounded-3xl overflow-hidden">
         {history.length > 0 ? (
-          <div className="divide-y divide-slate-800/60">
+          <div className="divide-y divide-slate-100">
             {history.map((item) => (
-              <div key={item.id} className="p-6 flex items-center justify-between flex-wrap gap-4 hover:bg-slate-900/30 transition-colors">
-                <div className="space-y-1">
-                  <span className="font-semibold text-slate-200 text-base block">{item.topic}</span>
-                  <div className="flex items-center gap-3 text-xs text-slate-500">
-                    <span className="capitalize px-1.5 py-0.5 rounded bg-slate-900 border border-slate-800/80 font-medium text-slate-400">{item.persona.replace('_', ' ')}</span>
+              <div key={item.id} className="p-6 flex items-center justify-between flex-wrap gap-4 hover:bg-slate-50/50 transition-colors">
+                <div className="space-y-1.5">
+                  <span className="font-bold text-slate-800 text-base block leading-snug">{item.topic}</span>
+                  <div className="flex items-center gap-3 text-xs text-slate-400">
+                    <span className="capitalize px-2 py-0.5 rounded bg-slate-50 border border-slate-200 font-semibold text-slate-600">{item.persona.replace('_', ' ')}</span>
                     <span>•</span>
                     <span>{item.timestamp}</span>
                   </div>
                 </div>
 
                 <div className="flex items-center gap-3">
-                  <span className={`text-xs px-2 py-1 rounded-md font-semibold ${
-                    item.status === 'complete' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' :
-                    item.status === 'failed' ? 'bg-red-500/10 text-red-400 border border-red-500/20' :
-                    'bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 animate-pulse'
+                  <span className={`text-xs px-2.5 py-1 rounded-md font-bold border ${
+                    item.status === 'complete' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' :
+                    item.status === 'failed' ? 'bg-red-50 text-red-700 border-red-200' :
+                    'bg-indigo-50 text-indigo-700 border-indigo-200 animate-pulse'
                   }`}>
                     {item.status}
                   </span>
                   <Link
                     href={`/research/${item.id}`}
-                    className="p-2 rounded-lg border border-slate-800 hover:border-slate-700 text-slate-400 hover:text-slate-200 transition-colors"
+                    className="p-2 rounded-lg border border-slate-200 hover:border-slate-350 hover:bg-slate-50 text-slate-500 hover:text-slate-800 transition-all"
                     title="View execution"
                   >
                     <Eye className="w-4 h-4" />
                   </Link>
                   <button
                     onClick={() => deleteItem(item.id)}
-                    className="p-2 rounded-lg border border-slate-800 hover:border-red-900/50 hover:text-red-400 text-slate-500 transition-colors cursor-pointer"
+                    className="p-2 rounded-lg border border-slate-200 hover:border-red-200 hover:bg-red-50 hover:text-red-600 text-slate-400 transition-all cursor-pointer"
                     title="Delete record"
                   >
                     <Trash2 className="w-4 h-4" />
@@ -70,9 +70,9 @@ export default function HistoryLogs() {
             ))}
           </div>
         ) : (
-          <div className="text-center py-20 text-slate-500 space-y-4">
+          <div className="text-center py-20 text-slate-450 space-y-4">
             <p className="text-sm">No research sessions logged yet.</p>
-            <Link href="/research" className="inline-flex items-center gap-1.5 text-sm font-semibold text-indigo-400 hover:underline">
+            <Link href="/research" className="inline-flex items-center gap-1.5 text-sm font-bold text-indigo-650 hover:underline">
               Deploy your first crew <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
